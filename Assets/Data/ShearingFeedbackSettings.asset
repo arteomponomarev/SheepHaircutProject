@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 598631826f978ce47bcbc4cdcaa5ed21, type: 3}
+  m_Name: ShearingFeedbackSettings
+  m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.ShearingFeedbackSettings
+  trimmerLoop: {fileID: 8300000, guid: 40ffa3b7aa2c598408d35b749d4d608d, type: 3}
+  cutAccent: {fileID: 8300000, guid: cf1fb80099ba9bd4eb026d5bc31c85b5, type: 3}
+  loopVolume: 0.2
+  cutVolume: 0.16
+  cutHoldSeconds: 0.075
+  accentInterval: 0.14
+  fluffInterval: 0.04
+  fluffPerBurst: 3
+  maxFluff: 64
+  fluffLifetime: 0.4
+  fluffSpeed: 0.3
+  hapticsEnabled: 1
+  hapticInterval: 0.16
+  trimmerAmplitude: 0.0025
+  trimmerTilt: 0.6
+  trimmerFrequency: 24

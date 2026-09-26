@@ -1,0 +1,20 @@
+{
+    "name": "ShearingInput",
+    "maps": [
+        {
+            "name": "Shearing",
+            "id": "bb081a4d-e4e5-4c51-a100-000000000001",
+            "actions": [
+                { "name": "Position", "type": "PassThrough", "id": "bb081a4d-e4e5-4c51-a100-000000000002", "expectedControlType": "Vector2" },
+                { "name": "Press", "type": "PassThrough", "id": "bb081a4d-e4e5-4c51-a100-000000000003", "expectedControlType": "Button" }
+            ],
+            "bindings": [
+                { "id": "bb081a4d-e4e5-4c51-a100-000000000004", "path": "<Mouse>/position", "action": "Position" },
+                { "id": "bb081a4d-e4e5-4c51-a100-000000000005", "path": "<Touchscreen>/primaryTouch/position", "action": "Position" },
+                { "id": "bb081a4d-e4e5-4c51-a100-000000000006", "path": "<Mouse>/leftButton", "action": "Press" },
+                { "id": "bb081a4d-e4e5-4c51-a100-000000000007", "path": "<Touchscreen>/primaryTouch/press", "action": "Press" }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

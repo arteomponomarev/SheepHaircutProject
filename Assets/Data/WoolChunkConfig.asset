@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a7b04d94c8f8124bb80a3bd340f13bc, type: 3}
+  m_Name: WoolChunkConfig
+  m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.WoolChunkConfig
+  meshVariants:
+  - {fileID: 4300000, guid: 107a7d42fe4e64f429509c2ecf37d42d, type: 2}
+  - {fileID: 4300000, guid: 190ae2c2405e16249acea9450552ea0f, type: 2}
+  - {fileID: 4300000, guid: 40c5480d4507bdf4bb433b0452617cdc, type: 2}
+  poolSize: 40
+  lifetime: {x: 2, y: 4}
+  areaPerChunk: 0.0004
+  maxSpawnsPerFrame: 3
+  scaleRange: {x: 0.85, y: 1.15}
+  surfaceOffset: 0.07
+  mass: 0.03
+  outwardImpulse: 0.018
+  downwardImpulse: 0.006
+  sidewaysImpulse: 0.004
+  angularSpeed: 3
+  linearDamping: 2
+  angularDamping: 1.2
