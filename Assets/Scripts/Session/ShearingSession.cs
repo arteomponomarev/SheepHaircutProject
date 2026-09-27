@@ -11,10 +11,11 @@ namespace ShearAndGrow
         [SerializeField] private ShearingInputAdapter input;
         [SerializeField] private ShearingGestureRouter gestures;
         [SerializeField] private WoolMaskPainter mask;
-        public bool HasResult => sheep != null && sheep.Status == PrototypeSheepState.SheepStatus.RecentlySheared;
+        public bool HasResult { get; private set; }
+        public bool EntryBlocked { get; private set; }
         public bool CanFinish => ownsSession && !HasResult && progress != null && progress.IsComplete;
-        public float ResultCoverage => sheep.ResultCoverage;
-        public float ResultWool => sheep.ResultWool;
+        public float ResultCoverage { get; private set; }
+        public float ResultWool { get; private set; }
         public event Action Changed;
         private bool ownsSession;
 
@@ -24,7 +25,8 @@ namespace ShearAndGrow
             { Debug.LogError("ShearingSession requires explicit state, progress and interaction references.", this); enabled = false; return; }
             progress.Changed += Refresh;
             ownsSession = sheep.TryBeginShearing();
-            if (!ownsSession) StopInteraction();
+            EntryBlocked = !ownsSession;
+            if (EntryBlocked) StopInteraction();
             Changed?.Invoke();
         }
         public void Finish()
@@ -32,6 +34,8 @@ namespace ShearAndGrow
             if (!CanFinish) return;
             // Set the durable in-run status before any UI can submit Finish again.
             if (!sheep.TryCompleteShearing(progress.Sheared01, progress.WoolEarned)) return;
+            ResultCoverage = sheep.ResultCoverage; ResultWool = sheep.ResultWool;
+            HasResult = true; ownsSession = false;
             StopInteraction(); Changed?.Invoke();
         }
         private void StopInteraction()

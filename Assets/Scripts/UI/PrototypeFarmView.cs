@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ShearAndGrow
 {
-    /// <summary>Minimal Stage 6 entry/state display; no economy, purchases or regrowth simulation.</summary>
+    /// <summary>Read-only farm status and shearing entry UI. Does not simulate growth.</summary>
     public sealed class PrototypeFarmView : MonoBehaviour
     {
         [SerializeField] private PrototypeSheepState sheep;
@@ -26,7 +26,7 @@ namespace ShearAndGrow
             bool ready = sheep.Status == PrototypeSheepState.SheepStatus.Ready;
             shearButton.interactable = ready;
             if (ready) statusLabel.text = "Sheep ready to shear";
-            else statusLabel.SetText("Recently sheared\nLast yield: {0:1} Wool\n\nRegrowth comes in Stage 7.", sheep.ResultWool);
+            else statusLabel.SetText("Wool growing: {0:0}%\nLast yield: {1:1} Wool", Mathf.Floor(sheep.WoolGrowth01 * 100f), sheep.ResultWool);
         }
         private void OnDisable()
         {

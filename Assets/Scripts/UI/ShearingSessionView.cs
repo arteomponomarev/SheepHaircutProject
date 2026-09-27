@@ -22,8 +22,9 @@ namespace ShearAndGrow
         private void Refresh()
         {
             finishButton.gameObject.SetActive(session.CanFinish);
-            resultPanel.SetActive(session.HasResult);
+            resultPanel.SetActive(session.HasResult || session.EntryBlocked);
             if (session.HasResult) resultLabel.SetText("Shearing complete\n\nSheared {0:1}%\nWool earned {1:1}", session.ResultCoverage * 100f, session.ResultWool);
+            else if (session.EntryBlocked) resultLabel.text = "Sheep is not ready\n\nReturn to the farm while its wool grows.";
         }
         private void OnDisable()
         {
