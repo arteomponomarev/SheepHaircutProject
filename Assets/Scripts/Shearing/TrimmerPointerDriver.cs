@@ -6,7 +6,7 @@ namespace ShearAndGrow
     /// <summary>Wires pointer gestures to surface tracking. No wool, reward or sheep-state logic.</summary>
     public sealed class TrimmerPointerDriver : MonoBehaviour
     {
-        [SerializeField] private ShearingInputAdapter input;
+        [SerializeField] private ShearingGestureRouter gestures;
         [SerializeField] private ShearingSurfaceRaycaster raycaster;
         [SerializeField] private TrimmerSurfaceView trimmerView;
         [SerializeField, Min(0f)] private float followTime = 0.025f;
@@ -22,16 +22,14 @@ namespace ShearAndGrow
 
         private void OnEnable()
         {
-            if (input == null || raycaster == null || trimmerView == null)
+            if (gestures == null || raycaster == null || trimmerView == null)
             {
-                Debug.LogError("TrimmerPointerDriver requires input, raycaster and trimmer view references.", this);
+                Debug.LogError("TrimmerPointerDriver requires gestures, raycaster and trimmer view references.", this);
                 enabled = false;
                 return;
             }
-            input.PressBegan += TrackPointer;
-            input.Held += TrackPointer;
-            input.Released += Release;
-            input.Canceled += EndGesture;
+            gestures.ShearPosition += TrackPointer;
+            gestures.GestureEnded += EndGesture;
             ClearContact();
         }
 
@@ -43,7 +41,7 @@ namespace ShearAndGrow
 
         private void LateUpdate()
         {
-            if (!gestureActive || !input.IsHeld)
+            if (!gestureActive || !gestures.IsShearing)
                 return;
             // Test the real pointer first: leaving the sheep drops contact immediately.
             if (!raycaster.TryGetHit(targetPosition, out _))
@@ -67,8 +65,6 @@ namespace ShearAndGrow
             SurfaceSampled?.Invoke(hit);
         }
 
-        private void Release(Vector2 position) => EndGesture();
-
         private void EndGesture()
         {
             gestureActive = false;
@@ -88,12 +84,10 @@ namespace ShearAndGrow
 
         private void OnDisable()
         {
-            if (input != null)
+            if (gestures != null)
             {
-                input.PressBegan -= TrackPointer;
-                input.Held -= TrackPointer;
-                input.Released -= Release;
-                input.Canceled -= EndGesture;
+                gestures.ShearPosition -= TrackPointer;
+                gestures.GestureEnded -= EndGesture;
             }
             EndGesture();
         }

@@ -7,9 +7,22 @@ namespace ShearAndGrow
     {
         [SerializeField] private Camera viewCamera;
         [SerializeField] private Collider surfaceCollider;
+        [Tooltip("Non-wool parts block starting an orbit on the sheep's head or legs.")]
+        [SerializeField] private Renderer[] nonWoolParts;
         [SerializeField, Min(0.1f)] private float maxDistance = 30f;
 
         public Vector3 ViewUp => viewCamera.transform.up;
+
+        public bool IsOverSheep(Vector2 screenPosition)
+        {
+            if (viewCamera == null || !viewCamera.pixelRect.Contains(screenPosition)) return true;
+            if (TryGetHit(screenPosition, out _)) return true;
+            Ray ray = viewCamera.ScreenPointToRay(screenPosition);
+            if (nonWoolParts != null)
+                foreach (var part in nonWoolParts)
+                    if (part != null && part.enabled && part.gameObject.activeInHierarchy && part.bounds.IntersectRay(ray)) return true;
+            return false;
+        }
 
         public bool TryGetHit(Vector2 screenPosition, out RaycastHit hit)
         {

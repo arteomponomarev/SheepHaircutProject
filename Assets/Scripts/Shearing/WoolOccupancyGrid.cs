@@ -7,17 +7,26 @@ namespace ShearAndGrow
     public sealed class WoolOccupancyGrid
     {
         private readonly bool[] removed;
+        private readonly bool[] eligible;
         public int Resolution { get; }
-        public int TotalCells => removed.Length;
+        public int TotalCells { get; }
         public int RemovedCells { get; private set; }
         public float Removed01 => (float)RemovedCells / TotalCells;
 
-        public WoolOccupancyGrid(int resolution)
+        public WoolOccupancyGrid(int resolution, bool[] coveredUvCells = null)
         {
             if (resolution < 16 || resolution > 512)
                 throw new ArgumentOutOfRangeException(nameof(resolution));
             Resolution = resolution;
             removed = new bool[resolution * resolution];
+            if (coveredUvCells == null) TotalCells = removed.Length;
+            else
+            {
+                if (coveredUvCells.Length != removed.Length) throw new ArgumentException("UV coverage must match the grid resolution.");
+                eligible = (bool[])coveredUvCells.Clone();
+                for (int i = 0; i < eligible.Length; i++) if (eligible[i]) TotalCells++;
+                if (TotalCells == 0) throw new ArgumentException("Wool mesh has no covered UV cells.");
+            }
         }
 
         // Cell centres sample the same circular stamps as the visual mask. Only visit its bounds.
@@ -47,7 +56,7 @@ namespace ShearAndGrow
                     if (dx * dx + dy * dy > radiusSquared) continue;
                     int column = wrapU ? (x % Resolution + Resolution) % Resolution : x;
                     int index = y * Resolution + column;
-                    if (removed[index]) continue;
+                    if (removed[index] || (eligible != null && !eligible[index])) continue;
                     removed[index] = true;
                     if (added == 0) firstRemovedUv = new Vector2((column + 0.5f) / Resolution, (y + 0.5f) / Resolution);
                     added++;

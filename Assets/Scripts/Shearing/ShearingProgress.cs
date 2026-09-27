@@ -5,6 +5,7 @@ namespace ShearAndGrow
 {
     /// <summary>Per-sheep unique coverage and session yield. No inventory, input or UI rules.</summary>
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(MeshFilter))]
     public sealed class ShearingProgress : MonoBehaviour
     {
         [SerializeField] private WoolMaskPainter maskPainter;
@@ -37,7 +38,10 @@ namespace ShearAndGrow
                 enabled = false;
                 return;
             }
-            grid = new WoolOccupancyGrid(Mathf.Clamp(gridResolution, 32, 256));
+            int resolution = Mathf.Clamp(gridResolution, 32, 256);
+            try { grid = new WoolOccupancyGrid(resolution, WoolUvCoverage.Build(GetComponent<MeshFilter>().sharedMesh, resolution)); }
+            catch (ArgumentException exception)
+            { Debug.LogError(exception.Message, this); enabled = false; return; }
             fullWoolAmount = sheepData.WoolAmount;
             completionThreshold = balance.CompletionThreshold;
             // State observes for its whole lifetime: disabling the view/component must not lose cuts.
