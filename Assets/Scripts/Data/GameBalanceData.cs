@@ -12,10 +12,13 @@ namespace ShearAndGrow
         [SerializeField, Min(1f)] private float woolGrowthSeconds = 90f;
         [Tooltip("Growth required to enter shearing. Stage 7 uses fully grown wool (1).")]
         [SerializeField, Range(0.01f, 1f)] private float readyToShearThreshold = 1f;
+        [Tooltip("Coins received per unit of Wool. Fractional Wool is retained when selling.")]
+        [SerializeField, Min(1)] private int woolUnitPrice = 1;
 
         public float CompletionThreshold => completionThreshold;
         public float WoolGrowthSeconds => woolGrowthSeconds;
         public float ReadyToShearThreshold => readyToShearThreshold;
+        public int WoolUnitPrice => woolUnitPrice;
 
         private void OnValidate()
         {
@@ -23,6 +26,7 @@ namespace ShearAndGrow
             woolGrowthSeconds = float.IsNaN(woolGrowthSeconds) || float.IsInfinity(woolGrowthSeconds)
                 ? 90f : Mathf.Max(1f, woolGrowthSeconds);
             readyToShearThreshold = float.IsNaN(readyToShearThreshold) ? 1f : Mathf.Clamp(readyToShearThreshold, 0.01f, 1f);
+            woolUnitPrice = Mathf.Max(1, woolUnitPrice);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace ShearAndGrow
         public float ResultCoverage { get; private set; }
         public float ResultWool { get; private set; }
         public event Action Changed;
+        /// <summary>Raised once, after the completion snapshot is finalized. No inventory dependency.</summary>
+        public event Action Completed;
         private bool ownsSession;
 
         private void Start()
@@ -36,7 +38,7 @@ namespace ShearAndGrow
             if (!sheep.TryCompleteShearing(progress.Sheared01, progress.WoolEarned)) return;
             ResultCoverage = sheep.ResultCoverage; ResultWool = sheep.ResultWool;
             HasResult = true; ownsSession = false;
-            StopInteraction(); Changed?.Invoke();
+            StopInteraction(); Completed?.Invoke(); Changed?.Invoke();
         }
         private void StopInteraction()
         {
