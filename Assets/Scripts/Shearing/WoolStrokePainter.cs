@@ -11,6 +11,17 @@ namespace ShearAndGrow
 
         private bool hasPrevious;
         private Vector2 previousUv;
+        private float brushRadiusOverride;
+        public float BrushRadius => brushRadiusOverride > 0 ? brushRadiusOverride : painter.BrushRadius;
+
+        /// <summary>Generic runtime brush configuration. No knowledge of upgrades or economy.</summary>
+        public void SetBrushRadius(float radius)
+        {
+            if (float.IsNaN(radius) || float.IsInfinity(radius) || radius < 0.005f || radius > 0.1f) return;
+            if (Mathf.Approximately(brushRadiusOverride, radius)) return;
+            brushRadiusOverride = radius;
+            BreakStroke();
+        }
 
         private void OnEnable()
         {
@@ -32,9 +43,9 @@ namespace ShearAndGrow
             { BreakStroke(); return; }
             Vector2 uv = hit.textureCoord;
             if (!hasPrevious)
-                painter.PaintCircle(uv, painter.BrushRadius);
+                painter.PaintCircle(uv, BrushRadius);
             else if ((uv - previousUv).sqrMagnitude > 0.00000001f)
-                painter.PaintStroke(previousUv, uv, painter.BrushRadius);
+                painter.PaintStroke(previousUv, uv, BrushRadius);
             previousUv = uv;
             hasPrevious = true;
         }

@@ -271,6 +271,7 @@ GameObject:
   - component: {fileID: 127569059}
   - component: {fileID: 127569058}
   - component: {fileID: 127569062}
+  - component: {fileID: 127569063}
   m_Layer: 0
   m_Name: ShearingInteraction
   m_TagString: Untagged
@@ -373,6 +374,20 @@ MonoBehaviour:
   surfaceSource: {fileID: 127569059}
   woolSurface: {fileID: 6411866393811556360}
   painter: {fileID: 6411866393811556361}
+--- !u!114 &127569063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127569057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b3b5698aafe2174f8eef703f5c823c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.TrimmerBrushBinding
+  upgrades: {fileID: 11400000, guid: d559bff08fff9ba489f38db1b224f6a6, type: 2}
+  strokes: {fileID: 127569062}
 --- !u!1 &189862539
 GameObject:
   m_ObjectHideFlags: 0

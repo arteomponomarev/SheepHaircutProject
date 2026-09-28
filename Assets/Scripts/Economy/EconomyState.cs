@@ -58,5 +58,15 @@ namespace ShearAndGrow
             coins += coinsEarned; wool = 0;
             Changed?.Invoke(); return true;
         }
+
+        public bool CanAfford(decimal cost) => cost >= 0 && Coins >= cost;
+
+        public bool TrySpendCoins(decimal cost)
+        {
+            if (!CanAfford(cost)) return false;
+            if (cost == 0) return true;
+            coins -= cost;
+            Changed?.Invoke(); return true;
+        }
     }
 }
