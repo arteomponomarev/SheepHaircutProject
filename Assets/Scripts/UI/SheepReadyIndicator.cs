@@ -9,6 +9,12 @@ namespace ShearAndGrow
         [SerializeField] private PrototypeSheepState sheep;
         [SerializeField] private Camera viewCamera;
         [SerializeField] private TextMeshPro label;
+        public void Bind(PrototypeSheepState state)
+        {
+            if (sheep != null) sheep.Changed -= Refresh;
+            sheep = state;
+            if (isActiveAndEnabled && sheep != null) { sheep.Changed += Refresh; Refresh(); }
+        }
 
         private void OnEnable()
         {

@@ -16,3 +16,6 @@ MonoBehaviour:
   woolGrowthSeconds: 90
   readyToShearThreshold: 1
   woolUnitPrice: 1
+  initialSheepCount: 1
+  firstSheepPrice: 150
+  sheepPriceIncrease: 100

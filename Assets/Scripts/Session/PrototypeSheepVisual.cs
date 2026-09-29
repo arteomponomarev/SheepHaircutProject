@@ -13,9 +13,22 @@ namespace ShearAndGrow
         [SerializeField] private Vector3 mediumWoolScale = new Vector3(0.975f, 0.955f, 0.945f);
         private Vector3 fullScale;
         private int visibleStage = -1;
-        private void Awake() { if (woolVisual != null) fullScale = woolVisual.transform.localScale; }
+        private bool scaleCached;
+        private void CacheScale()
+        {
+            if (scaleCached || woolVisual == null) return;
+            fullScale = woolVisual.transform.localScale; scaleCached = true;
+        }
+        private void Awake() => CacheScale();
+        public void Bind(PrototypeSheepState state)
+        {
+            if (sheep != null) sheep.Changed -= Refresh;
+            sheep = state; visibleStage = -1; CacheScale();
+            if (isActiveAndEnabled && sheep != null) { sheep.Changed += Refresh; Refresh(); }
+        }
         private void OnEnable()
         {
+            CacheScale();
             if (sheep == null || woolVisual == null)
             { Debug.LogError("Sheep visual requires state and wool references.", this); enabled = false; return; }
             sheep.Changed += Refresh; Refresh();

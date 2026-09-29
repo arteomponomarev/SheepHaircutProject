@@ -9,6 +9,7 @@ namespace ShearAndGrow
         [SerializeField] private string farmScene = "Assets/Scenes/FarmPrototype.unity";
         [SerializeField] private string shearingScene = "Assets/Scenes/ShearingPrototype.unity";
         private bool loading;
+        public bool IsLoading => loading;
         public void OpenFarm() => Open(farmScene);
         public void OpenShearing() => Open(shearingScene);
         private void Open(string path)
