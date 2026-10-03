@@ -9,12 +9,15 @@ namespace ShearAndGrow
     public sealed class SheepRosterState : ScriptableObject
     {
         [SerializeField] private GameBalanceData balance;
+        [SerializeField] private BarnController barn;
         private static int runVersion;
         [NonSerialized] private int initializedVersion = -1;
         [NonSerialized] private List<PrototypeSheepState> sheep;
         [NonSerialized] private int selectedIndex, initialCount;
         public event Action Changed;
-        public bool IsConfigured => balance != null;
+        public BarnController Barn => barn;
+        public bool IsConfigured => balance != null && barn != null && barn.IsConfigured && balance.InitialSheepCount <= barn.Capacity;
+        public bool HasFreeSpace => IsConfigured && Count < barn.Capacity;
         public int Count { get { EnsureRun(); return sheep == null ? 0 : sheep.Count; } }
         public int PurchasedCount { get { EnsureRun(); return Count - initialCount; } }
         public int SelectedIndex { get { EnsureRun(); return selectedIndex; } }
@@ -41,7 +44,7 @@ namespace ShearAndGrow
         { EnsureRun(); return sheep != null && index >= 0 && index < sheep.Count ? sheep[index] : null; }
         public PrototypeSheepState AddSheep()
         {
-            EnsureRun(); if (!IsConfigured) return null;
+            EnsureRun(); if (!HasFreeSpace) return null;
             var state = CreateSheep(); Changed?.Invoke(); return state;
         }
         public bool CanSelect(int index)

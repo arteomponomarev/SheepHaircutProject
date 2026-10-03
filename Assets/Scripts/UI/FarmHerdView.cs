@@ -30,6 +30,7 @@ namespace ShearAndGrow
             { int slot = i; selectActions[i] = () => Select(slot); sheepButtons[i].onClick.AddListener(selectActions[i]); }
             manager.Roster.Changed += HerdChanged; manager.Economy.Changed += RefreshPurchase;
             manager.Changed += RefreshPurchase;
+            manager.Roster.Barn.Changed += RefreshPurchase;
             buyButton.onClick.AddListener(Buy); previousButton.onClick.AddListener(Previous); nextButton.onClick.AddListener(Next);
             page = manager.Roster.SelectedIndex / sheepButtons.Length; BindPage();
         }
@@ -50,7 +51,6 @@ namespace ShearAndGrow
                 if (shown[i] != null) shown[i].Changed += RefreshSheep;
                 sheepButtons[i].gameObject.SetActive(shown[i] != null); display.Show(i, shown[i]);
             }
-            countLabel.SetText("Sheep: {0}", manager.Roster.Count);
             pageLabel.SetText("Page {0} / {1}", page + 1, PageCount);
             previousButton.interactable = page > 0; nextButton.interactable = page + 1 < PageCount;
             RefreshSheep(); RefreshPurchase();
@@ -69,7 +69,13 @@ namespace ShearAndGrow
         }
         private void RefreshPurchase()
         {
+            countLabel.SetText("Sheep: {0} / {1}", manager.Roster.Count, manager.Roster.Barn.Capacity);
             buyButton.interactable = manager.CanBuySheep;
+            if (manager.IsBarnFull)
+            {
+                buyLabel.text = manager.Roster.Barn.IsMaxLevel ? "Barn Full\nMaximum Capacity Reached" : "Barn Full\nUpgrade Barn";
+                return;
+            }
             buyLabel.text = "Buy Sheep: " + manager.NextSheepPrice.ToString("0", CultureInfo.InvariantCulture) + " Coins"
                 + (manager.CanBuySheep ? "" : "\nNeed Coins");
         }
@@ -77,7 +83,15 @@ namespace ShearAndGrow
         {
             UnsubscribeSheep();
             if (manager != null)
-            { manager.Changed -= RefreshPurchase; if (manager.Roster != null) manager.Roster.Changed -= HerdChanged; if (manager.Economy != null) manager.Economy.Changed -= RefreshPurchase; }
+            {
+                manager.Changed -= RefreshPurchase;
+                if (manager.Roster != null)
+                {
+                    manager.Roster.Changed -= HerdChanged;
+                    if (manager.Roster.Barn != null) manager.Roster.Barn.Changed -= RefreshPurchase;
+                }
+                if (manager.Economy != null) manager.Economy.Changed -= RefreshPurchase;
+            }
             if (buyButton != null) buyButton.onClick.RemoveListener(Buy);
             if (previousButton != null) previousButton.onClick.RemoveListener(Previous);
             if (nextButton != null) nextButton.onClick.RemoveListener(Next);

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0735a2ffc16c04a83d00a6baf73ed3, type: 3}
+  m_Name: BarnUpgradeData
+  m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.BarnUpgradeData
+  levels:
+  - price: 0
+    capacity: 3
+  - price: 300
+    capacity: 5
+  - price: 600
+    capacity: 8

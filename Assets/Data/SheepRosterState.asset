@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SheepRosterState
   m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.SheepRosterState
   balance: {fileID: 11400000, guid: c9fa481366ea36c47ba42260fb69941e, type: 2}
+  barn: {fileID: 11400000, guid: e1f06af624437ad4689c9659ce0defcf, type: 2}

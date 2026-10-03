@@ -14,7 +14,8 @@ namespace ShearAndGrow
         public EconomyState Economy => economy;
         public bool IsConfigured => roster != null && roster.IsConfigured && economy != null && balance != null;
         public decimal NextSheepPrice => IsConfigured ? balance.SheepPurchasePrice(roster.PurchasedCount) : 0;
-        public bool CanBuySheep => IsConfigured && !purchasing && economy.CanAfford(NextSheepPrice);
+        public bool IsBarnFull => IsConfigured && !roster.HasFreeSpace;
+        public bool CanBuySheep => IsConfigured && !purchasing && roster.HasFreeSpace && economy.CanAfford(NextSheepPrice);
         public bool TryBuySheep()
         {
             if (!CanBuySheep) return false;
