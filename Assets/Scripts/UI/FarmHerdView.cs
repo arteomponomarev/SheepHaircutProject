@@ -14,6 +14,7 @@ namespace ShearAndGrow
         [SerializeField] private UnityEngine.UI.Button buyButton, previousButton, nextButton;
         [SerializeField] private UnityEngine.UI.Button[] sheepButtons;
         [SerializeField] private TMP_Text[] sheepLabels;
+        [SerializeField] private SheepFeedView[] feedViews;
         private PrototypeSheepState[] shown;
         private UnityEngine.Events.UnityAction[] selectActions;
         private int page;
@@ -50,6 +51,7 @@ namespace ShearAndGrow
                 shown[i] = manager.Roster.GetSheep(page * shown.Length + i);
                 if (shown[i] != null) shown[i].Changed += RefreshSheep;
                 sheepButtons[i].gameObject.SetActive(shown[i] != null); display.Show(i, shown[i]);
+                if (feedViews != null && i < feedViews.Length && feedViews[i] != null) feedViews[i].Bind(shown[i]);
             }
             pageLabel.SetText("Page {0} / {1}", page + 1, PageCount);
             previousButton.interactable = page > 0; nextButton.interactable = page + 1 < PageCount;
