@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6b8dae8e4874598ae5304849e41b05, type: 3}
+  m_Name: WashHapticsConfig
+  m_EditorClassIdentifier: ShearAndGrow.Shearing::ShearAndGrow.Shearing.HapticsConfig
+  Profiles:
+  - {fileID: 11400000, guid: 92fb6a1f5fdf74b699a98b9ebf59dafe, type: 2}
+  - {fileID: 11400000, guid: 2656141ec7c04450aa880c003e99ff44, type: 2}
+  - {fileID: 11400000, guid: f27a3655054bc43c0b0dbdb32a20275b, type: 2}
+  DefaultProfile: 1
+  StopTimeout: 0.15
+  MinContactArea: 0.00002
+  MinChunkSize: 1.3
+  RespectAndroidTouchFeedbackSetting: 0

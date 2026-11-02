@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87cd8d9c78c4740d39b31139af30395a, type: 3}
+  m_Name: ChunkPhysicsConfig
+  m_EditorClassIdentifier: ShearAndGrow.Shearing::ShearAndGrow.Shearing.ChunkPhysicsConfig
+  ClumpRegionRadius: 0.075
+  HeroClumpFraction: 0.18
+  HeroClumpScale: 1.55
+  HangingThreshold: 0.6
+  DetachThreshold: 0.2
+  HangDuration: {x: 0.15, y: 0.7}
+  HeroExtraHang: 0.35
+  MinHang: 0.12
+  MaxHangStretch: 0.12
+  MaxHeroActive: 20
+  HeroIterations: 4
+  StandardIterations: 1
+  ShapeStiffness: 0.35
+  HangingStiffness: 0.18
+  FixedStep: 0.016666668
+  MaxSubsteps: 3
+  Gravity: 9.81
+  AirDrag: 2.2
+  TumbleStrength: 0.6
+  DetachImpulse: 0.55
+  TangentImpulse: 0.6
+  GroundFriction: 0.85
+  SleepVelocity: 0.06
+  SleepTime: 0.3
+  LandedDamping: 9
+  MaxSettleTime: 1.4
+  MaxAirTime: 6
+  FloorY: 0
+  FloorHalfExtents: {x: 2.6, y: 2.6}
+  FloorGridResolution: 96
+  FloorIndividualBudget: 160
+  MergeBatchSize: 24
+  PoolSize: 260
