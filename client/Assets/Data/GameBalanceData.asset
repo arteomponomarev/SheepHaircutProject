@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GameBalanceData
   m_EditorClassIdentifier: Assembly-CSharp::ShearAndGrow.GameBalanceData
   completionThreshold: 0.95
-  woolGrowthSeconds: 90
+  woolGrowthSeconds: 10
   readyToShearThreshold: 1
   woolUnitPrice: 1
   initialSheepCount: 1
