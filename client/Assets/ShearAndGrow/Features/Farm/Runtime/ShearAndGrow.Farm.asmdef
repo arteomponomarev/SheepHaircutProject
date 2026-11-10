@@ -1,0 +1,20 @@
+{
+    "name": "ShearAndGrow.Farm",
+    "rootNamespace": "ShearAndGrow.Farm",
+    "references": [
+        "ShearAndGrow.Core",
+        "ShearAndGrow.Shearing",
+        "ShearAndGrow.Processing",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

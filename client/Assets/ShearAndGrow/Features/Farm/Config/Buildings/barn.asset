@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9732c336b447842ec8a43b6e8bab34f0, type: 3}
+  m_Name: barn
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmBuildingDefinition
+  Id: barn
+  DisplayName: Barn & Sheep Pen
+  Description: Home of your sheep. The pen moves with the barn.
+  Kind: 1
+  Category: 0
+  Interaction: 2
+  Footprint: {x: 5, y: 8}
+  Movable: 1
+  Storable: 0
+  Connect: 0
+  ShowInCatalog: 0
+  Purchasable: 0
+  Price: 0
+  MaxInstances: 1
+  RequiredFarmerHouseLevel: 1
+  Icon: {fileID: -5769705671697938605, guid: 6e39f0e62ff5b4de49ec2f786eccb3e1, type: 3}
+  ConstructionSeconds: 0
+  VisualPrefab: {fileID: 1511615343800819881, guid: b841a9cb276c3434eaaa95a2c6d5d635, type: 3}
+  StartLevel: 1
+  MaxLevel: 2
+  UpgradeLevels:
+  - Level: 2
+    RequiredFarmerHouseLevel: 2
+    Cost: 250
+    Seconds: 15
+    Benefit: Room for 4 sheep
+  MandatoryForProgression: 1

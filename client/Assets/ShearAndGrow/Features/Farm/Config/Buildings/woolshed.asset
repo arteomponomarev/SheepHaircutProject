@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9732c336b447842ec8a43b6e8bab34f0, type: 3}
+  m_Name: woolshed
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmBuildingDefinition
+  Id: woolshed
+  DisplayName: Wool Processing
+  Description: "Wash and dry your wool here \u2013 clean wool sells for much more."
+  Kind: 2
+  Category: 0
+  Interaction: 3
+  Footprint: {x: 4, y: 3}
+  Movable: 1
+  Storable: 0
+  Connect: 0
+  ShowInCatalog: 1
+  Purchasable: 1
+  Price: 80
+  MaxInstances: 1
+  RequiredFarmerHouseLevel: 1
+  Icon: {fileID: 1436068138210525896, guid: 59fb72b0667ae4436b762f053036e7ef, type: 3}
+  ConstructionSeconds: 8
+  VisualPrefab: {fileID: 3120102069512708568, guid: 7fe4a7f1a0e6f41b2a19441e10e3ffaa, type: 3}
+  StartLevel: 1
+  MaxLevel: 1
+  UpgradeLevels: []
+  MandatoryForProgression: 1

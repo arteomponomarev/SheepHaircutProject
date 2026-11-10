@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9732c336b447842ec8a43b6e8bab34f0, type: 3}
+  m_Name: decor_stone
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmBuildingDefinition
+  Id: decor_stone
+  DisplayName: Decorative Stone
+  Description: Mossy garden stones.
+  Kind: 4
+  Category: 1
+  Interaction: 0
+  Footprint: {x: 1, y: 1}
+  Movable: 1
+  Storable: 1
+  Connect: 0
+  ShowInCatalog: 1
+  Purchasable: 1
+  Price: 4
+  MaxInstances: 0
+  RequiredFarmerHouseLevel: 1
+  Icon: {fileID: 8396091391487368457, guid: 32078dc2417294c3b88f5daa2b725453, type: 3}
+  ConstructionSeconds: 0
+  VisualPrefab: {fileID: 6410808345888198227, guid: 66f145b63b69b40d392947e790b1b26f, type: 3}
+  StartLevel: 1
+  MaxLevel: 1
+  UpgradeLevels: []
+  MandatoryForProgression: 1

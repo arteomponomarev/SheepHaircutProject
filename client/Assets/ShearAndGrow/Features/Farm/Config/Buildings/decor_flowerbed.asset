@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9732c336b447842ec8a43b6e8bab34f0, type: 3}
+  m_Name: decor_flowerbed
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmBuildingDefinition
+  Id: decor_flowerbed
+  DisplayName: Flower Bed
+  Description: Colourful flowers in a wooden box.
+  Kind: 4
+  Category: 1
+  Interaction: 0
+  Footprint: {x: 1, y: 1}
+  Movable: 1
+  Storable: 1
+  Connect: 0
+  ShowInCatalog: 1
+  Purchasable: 1
+  Price: 8
+  MaxInstances: 0
+  RequiredFarmerHouseLevel: 1
+  Icon: {fileID: 7820502902984483797, guid: 8e5857389b7164defaab34f3fe789af1, type: 3}
+  ConstructionSeconds: 0
+  VisualPrefab: {fileID: 7238880374334650801, guid: 738cc4da814d044979006c6282c79428, type: 3}
+  StartLevel: 1
+  MaxLevel: 1
+  UpgradeLevels: []
+  MandatoryForProgression: 1

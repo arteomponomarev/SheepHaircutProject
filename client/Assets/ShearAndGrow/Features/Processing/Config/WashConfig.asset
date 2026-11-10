@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eda9da6cce2aa475e8e7d94e23cbac46, type: 3}
+  m_Name: WashConfig
+  m_EditorClassIdentifier: ShearAndGrow.Processing::ShearAndGrow.Processing.ProcessingConfig
+  Stage: 0
+  Input: 0
+  CompletionThreshold: 0.9
+  CellDoneLevel: 0.85
+  BrushRadius: 0.062
+  DosePerSecond: 2.2
+  MinSweepDose: 0.34
+  StampSpacing: 0.3
+  AccentStep: 0.08
+  FeedbackRateForMax: 0.06
+  PuffsPerTier: d20000002c01000090010000i
+  HeapHalfSize: {x: 0.3, y: 0.24}
+  HeapHeight: 0.2
+  PuffRadius: {x: 0.034, y: 0.058}
+  Seed: 4711
+  DirtyColor: {r: 0.9, g: 0.79, b: 0.56, a: 1}
+  DirtSpotColor: {r: 0.5, g: 0.4, b: 0.28, a: 1}
+  WetColor: {r: 0.6, g: 0.61, b: 0.62, a: 1}
+  DryColor: {r: 0.99, g: 0.975, b: 0.94, a: 1}
+  Haptics: {fileID: 11400000, guid: 5ca8f618e3fa5444b82f332dec8fa549, type: 2}
+  MasterVolume: 0.9
+  LoopVolume: 0.42
+  ImpactLayerVolume: 0.5
+  OneShotVolume: 0.55
+  LoopRampSeconds: 0.08
+  Title: Wash Wool
+  HintText: Hold & drag to wash
+  ProgressLabel: Washed
+  EmptyText: 'No dirty wool yet.
+
+    Shear a sheep first!'

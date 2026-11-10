@@ -1,0 +1,19 @@
+{
+    "name": "ShearAndGrow.Processing",
+    "rootNamespace": "ShearAndGrow.Processing",
+    "references": [
+        "ShearAndGrow.Core",
+        "ShearAndGrow.Shearing",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e56a59bbace454784574a38a8413db, type: 3}
+  m_Name: FarmProgressionConfig
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmProgressionConfig
+  HouseLevels:
+  - Level: 2
+    UpgradeCost: 300
+    UpgradeSeconds: 20
+    Unlocks: Trimmer Workshop, Feeding Station, Barn Lv 2
+  BarnCapacityByLevel: 0200000004000000i
+  SheepPrice: 200
+  SheepNames:
+  - Bella
+  - Mia
+  - Pip
+  - Luna
+  - Toffee
+  - Willow
+  - Maple
+  - Biscuit
+  - Hazel
+  - Poppy
+  MaxVisibleSheep: 6
+  FeedPrice: 20
+  FeedBoostMultiplier: 2
+  FeedBoostSeconds: 180

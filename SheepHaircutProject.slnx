@@ -1,0 +1,12 @@
+<Solution>
+  <Project Path="client/ShearAndGrow.Farm.csproj" />
+  <Project Path="client/ShearAndGrow.Shearing.csproj" />
+  <Project Path="client/ShearAndGrow.Processing.csproj" />
+  <Project Path="client/ShearAndGrow.Processing.Editor.csproj" />
+  <Project Path="client/ShearAndGrow.Core.csproj" />
+  <Project Path="client/ShearAndGrow.Shearing.Editor.csproj" />
+  <Project Path="client/Assembly-CSharp.csproj" />
+  <Project Path="client/ShearAndGrow.Farm.Editor.csproj" />
+  <Project Path="client/ShearAndGrow.Farm.Tests.csproj" />
+  <Project Path="client/Assembly-CSharp-Editor.csproj" />
+</Solution>
