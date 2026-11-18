@@ -41,6 +41,7 @@ namespace ShearAndGrow.Processing
             _root = dim.gameObject;
             var card = UiKit.Image(dim.transform, "SellCard", UiKit.Panel, true);
             UiKit.Place(card.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -60f), new Vector2(960f, 1040f));
+            _card = card.rectTransform;
             var title = UiKit.Text(card.transform, "Title", "Sell Wool", 64, TextAnchor.MiddleLeft);
             UiKit.Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(50f, -30f), new Vector2(600f, 100f));
             var close = UiKit.Button(card.transform, "Close", "✕", 52, UiKit.PanelLight, Close, out _);
@@ -51,6 +52,7 @@ namespace ShearAndGrow.Processing
                 int idx = i;
                 var row = UiKit.Image(card.transform, Names[i] + "Row", UiKit.PanelLight, true);
                 UiKit.Place(row.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -160f - i * 190f), new Vector2(880f, 170f));
+                _rows[i] = row.rectTransform;
                 var toggle = row.gameObject.AddComponent<Toggle>();
                 toggle.targetGraphic = row;
                 var box = UiKit.Image(row.transform, "Box", new Color(1f, 1f, 1f, 0.15f));
@@ -89,6 +91,45 @@ namespace ShearAndGrow.Processing
                 _coinPool[i] = c.rectTransform;
             }
             _root.SetActive(false);
+            ApplyLayout();
+            ShearAndGrow.Economy.ScreenLayout.Changed += ApplyLayout;
+        }
+
+        RectTransform _card;
+        readonly RectTransform[] _rows = new RectTransform[3];
+
+        void OnDestroy() => ShearAndGrow.Economy.ScreenLayout.Changed -= ApplyLayout;
+
+        /// <summary>
+        /// Portrait: the original tall card. Landscape: a wide card – wool rows on the left, total and the two sell
+        /// buttons on the right – so nothing is cut off on a ~1000-unit-high screen. Selection / sale logic unchanged.
+        /// </summary>
+        void ApplyLayout()
+        {
+            if (_card == null) return;
+            bool landscape = ShearAndGrow.Economy.ScreenLayout.IsLandscape;
+            var selRt = (RectTransform)_sellSelected.transform;
+            var allRt = (RectTransform)_sellAll.transform;
+            if (landscape)
+            {
+                UiKit.Place(_card, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(1640f, 760f));
+                for (int i = 0; i < 3; i++)
+                    UiKit.Place(_rows[i], new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -150f - i * 190f), new Vector2(880f, 170f));
+                UiKit.Place(_total.rectTransform, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-40f, 40f), new Vector2(660f, 90f));
+                UiKit.Place(selRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-40f, 50f), new Vector2(320f, 130f));
+                UiKit.Place(allRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-380f, 50f), new Vector2(320f, 130f));
+            }
+            else
+            {
+                UiKit.Place(_card, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -60f), new Vector2(960f, 1040f));
+                for (int i = 0; i < 3; i++)
+                    UiKit.Place(_rows[i], new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -160f - i * 190f), new Vector2(880f, 170f));
+                UiKit.Place(_total.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 200f), new Vector2(880f, 80f));
+                UiKit.Place(selRt, new Vector2(0.5f, 0f), new Vector2(1f, 0f), new Vector2(-15f, 50f), new Vector2(425f, 130f));
+                UiKit.Place(allRt, new Vector2(0.5f, 0f), new Vector2(0f, 0f), new Vector2(15f, 50f), new Vector2(425f, 130f));
+            }
+            Canvas.ForceUpdateCanvases();
+            ShearAndGrow.Shearing.UiFit.ScaleToFit(_card, _safe);
         }
 
         public void Open()
@@ -96,6 +137,7 @@ namespace ShearAndGrow.Processing
             for (int i = 0; i < 3; i++) _toggles[i].SetIsOnWithoutNotify(WoolEconomy.Instance.Available((WoolType)i) > 0);
             RefreshValues();
             _root.SetActive(true);
+            ApplyLayout();
         }
 
         public void Close()

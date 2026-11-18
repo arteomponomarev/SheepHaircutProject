@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db0207b4ada1346c293725ca188326ea, type: 3}
+  m_Name: FarmCameraPresets
+  m_EditorClassIdentifier: ShearAndGrow.Farm::ShearAndGrow.Farm.FarmCameraPresetLibrary
+  Presets:
+  - Id: iso30
+    DisplayName: Isometric 30
+    Yaw: 45
+    Pitch: 30
+    Projection: 0
+    FieldOfView: 25
+    OrthoDistance: 45
+    MinSize: 3.2
+    MaxSize: 26
+  - Id: clash40
+    DisplayName: Clash-like 40
+    Yaw: 45
+    Pitch: 40
+    Projection: 1
+    FieldOfView: 25
+    OrthoDistance: 45
+    MinSize: 3.2
+    MaxSize: 26
+  - Id: iso50
+    DisplayName: Isometric 50
+    Yaw: 45
+    Pitch: 50
+    Projection: 0
+    FieldOfView: 25
+    OrthoDistance: 45
+    MinSize: 3.2
+    MaxSize: 26

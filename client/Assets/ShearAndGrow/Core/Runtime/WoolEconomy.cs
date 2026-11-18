@@ -346,7 +346,51 @@ namespace ShearAndGrow.Economy
             EconomyStore.DeleteAll();
             _openBatch = null;
             _state = CreateDefault(_balance);
+            UnseenShearedWool = 0;
             Changed?.Invoke();
         }
+
+#if UNITY_EDITOR || UNITY_ENABLE_CHECKS
+        // ------------------------------------------------------------------ developer panel (compiled out of release builds)
+
+        /// <summary>Upper limits for debug values (no overflow in sums / sale values / UI).</summary>
+        public const long DevMaxCoins = 999_999_999_999L;
+        public const int DevMaxWool = 100_000_000;
+
+        /// <summary>Sets coins (clamped to 0..<see cref="DevMaxCoins"/>) in one atomic save. Returns false if the save failed.</summary>
+        public bool DevSetCoins(long value)
+        {
+            long v = Math.Max(0L, Math.Min(DevMaxCoins, value));
+            long prev = _state.coins;
+            _state.coins = v;
+            if (Commit()) return true;
+            _state.coins = prev; Changed?.Invoke();
+            return false;
+        }
+
+        /// <summary>Adds coins with overflow protection (dev only).</summary>
+        public bool DevAddCoinsClamped(long amount) => amount > 0 && DevSetCoins(amount > DevMaxCoins - _state.coins ? DevMaxCoins : _state.coins + amount);
+
+        /// <summary>Back to the starting coins of a new player (test saves only).</summary>
+        public bool DevResetCoins() => DevSetCoins(_balance.StartingCoins);
+
+        /// <summary>Sets a wool stock (clamped to 0..<see cref="DevMaxWool"/>). Never negative, never overflowing.</summary>
+        public bool DevSetWool(WoolType t, int value)
+        {
+            int v = Math.Max(0, Math.Min(DevMaxWool, value));
+            int prev = _state.Get(t);
+            _state.Set(t, v);
+            if (Commit()) return true;
+            _state.Set(t, prev); Changed?.Invoke();
+            return false;
+        }
+
+        public bool DevAddWoolClamped(WoolType t, int amount)
+        {
+            if (amount <= 0) return false;
+            long next = (long)_state.Get(t) + amount;
+            return DevSetWool(t, next > DevMaxWool ? DevMaxWool : (int)next);
+        }
+#endif
     }
 }

@@ -7,13 +7,16 @@ namespace ShearAndGrow.Processing
     {
         public RectTransform Target;
         Rect _last;
+        Vector2Int _lastScreen;
 
         void Update()
         {
             if (Target == null) return;
             Rect sa = Screen.safeArea;
-            if (sa == _last) return;
+            var screen = new Vector2Int(Screen.width, Screen.height);
+            if (sa == _last && screen == _lastScreen) return;
             _last = sa;
+            _lastScreen = screen;
             float w = Mathf.Max(1, Screen.width), h = Mathf.Max(1, Screen.height);
             Target.anchorMin = new Vector2(sa.xMin / w, sa.yMin / h);
             Target.anchorMax = new Vector2(sa.xMax / w, sa.yMax / h);

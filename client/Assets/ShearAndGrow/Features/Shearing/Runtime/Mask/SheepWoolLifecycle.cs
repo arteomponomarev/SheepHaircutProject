@@ -40,7 +40,8 @@ namespace ShearAndGrow.Shearing
         /// </summary>
         public static int CatchUp(SheepWoolState s, ShearMaskAuthority mask, WoolGrowthConfig cfg, double clockNow)
         {
-            if (double.IsNaN(s.growthClockStamp) || s.growthClockStamp < 0 || s.growthClockStamp > clockNow + 1)
+            if (cfg != null && s.growthClockMode != (int)cfg.TimeMode) ConvertTimebase(s, cfg.TimeMode, clockNow);
+            if (double.IsNaN(s.growthClockStamp)|| s.growthClockStamp < 0 || s.growthClockStamp > clockNow + 1)
             {
                 // first time / migrated / clock reset (e.g. new install with copied save): start growing from now
                 s.growthClockStamp = clockNow;
@@ -73,6 +74,26 @@ namespace ShearAndGrow.Shearing
             mask.ApplyGrowth(steps);
             return steps;
         }
+
+        /// <summary>
+        /// Moves a save's clock values from its stored timebase into <paramref name="mode"/> (e.g. the switch from
+        /// GameTime to RealTime offline regrowth): every clock value keeps its distance to "now", so growth already
+        /// pending and an active feed boost survive exactly; nothing regrows instantly.
+        /// </summary>
+        public static void ConvertTimebase(SheepWoolState s, WoolGrowthTimeMode mode, double clockNowInMode)
+        {
+            var from = (WoolGrowthTimeMode)s.growthClockMode;
+            if (from == mode) return;
+            double fromNow = WoolGrowthClock.Now(from);
+            double shift = clockNowInMode - fromNow;
+            if (!(double.IsNaN(s.growthClockStamp) || s.growthClockStamp < 0))
+                s.growthClockStamp = Math.Min(clockNowInMode, s.growthClockStamp + shift);
+            if (s.feedBoostUntil > 0) s.feedBoostUntil += shift;
+            s.growthClockMode = (int)mode;
+        }
+
+        /// <summary>Marks a brand-new save with the timebase of the config it is stamped with.</summary>
+        public static void StampMode(SheepWoolState s, WoolGrowthConfig cfg) => s.growthClockMode = cfg != null ? (int)cfg.TimeMode : (int)WoolGrowthTimeMode.GameTime;
 
         /// <summary>Restart the growth clock without growing (end of a shearing session, unlock, after loading).</summary>
         public static void Restamp(SheepWoolState s, double clockNow) { s.growthClockStamp = clockNow; }

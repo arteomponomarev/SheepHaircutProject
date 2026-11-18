@@ -1,0 +1,23 @@
+{
+    "name": "ShearAndGrow.DevTools",
+    "rootNamespace": "ShearAndGrow.DevTools",
+    "references": [
+        "ShearAndGrow.Core",
+        "ShearAndGrow.Shearing",
+        "ShearAndGrow.Processing",
+        "ShearAndGrow.Farm",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_EDITOR || DEVELOPMENT_BUILD"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

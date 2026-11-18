@@ -20,6 +20,9 @@ namespace ShearAndGrow.Farm
         FarmHubController _hub;
         Vector3 _lastCamPos;
         float _lastSize = -1f;
+        Quaternion _lastCamRot;
+        bool _lastOrtho;
+        float _lastFov;
 
         public void Build(FarmHubController hub, Camera cam, RectTransform safe, IEnumerable<FarmInteractable> targets)
         {
@@ -105,7 +108,9 @@ namespace ShearAndGrow.Farm
             if (_canvasRt == null) _canvasRt = (RectTransform)_root.GetComponentInParent<Canvas>().rootCanvas.transform;
             var canvas = _canvasRt.GetComponent<Canvas>();
             bool camMoved = (_cam.transform.position - _lastCamPos).sqrMagnitude > 1e-6f || Mathf.Abs(_cam.orthographicSize - _lastSize) > 1e-4f
-                            || Mathf.Abs(_cam.aspect - _lastAspect) > 1e-5f;
+                            || Mathf.Abs(_cam.aspect - _lastAspect) > 1e-5f || _cam.transform.rotation != _lastCamRot
+                            || _cam.orthographic != _lastOrtho || Mathf.Abs(_cam.fieldOfView - _lastFov) > 1e-4f;
+            _lastCamRot = _cam.transform.rotation; _lastOrtho = _cam.orthographic; _lastFov = _cam.fieldOfView;
             bool layoutChanged = _canvasRt.rect.size != _lastCanvasSize || Mathf.Abs(canvas.scaleFactor - _lastScaleFactor) > 1e-5f
                                  || _lastScreen.x != Screen.width || _lastScreen.y != Screen.height || Screen.safeArea != _lastSafeArea;
             _lastCamPos = _cam.transform.position; _lastSize = _cam.orthographicSize; _lastAspect = _cam.aspect;

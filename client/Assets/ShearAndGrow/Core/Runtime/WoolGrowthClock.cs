@@ -8,7 +8,7 @@ namespace ShearAndGrow.Economy
     {
         /// <summary>Wool only grows while the game runs (any scene). Default.</summary>
         GameTime = 0,
-        /// <summary>Wool also grows while the app is closed (UTC wall clock). Prepared for later.</summary>
+        /// <summary>Wool also grows while the app is closed (UTC wall clock via <see cref="GameClock"/>). Offline regrowth.</summary>
         RealTime = 1,
     }
 
@@ -32,8 +32,17 @@ namespace ShearAndGrow.Economy
 
         public static double GameSeconds { get { EnsureLoaded(); return _gameSeconds; } }
 
+        static readonly DateTime RealTimeEpoch = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        /// <summary>
+        /// Current growth clock value. RealTime = seconds since 2025-01-01 UTC from <see cref="GameClock"/> (monotonic,
+        /// rollback-protected, dev test timeline aware; swap the GameClock source for trusted server time later).
+        /// </summary>
         public static double Now(WoolGrowthTimeMode mode) =>
-            mode == WoolGrowthTimeMode.RealTime ? (DateTime.UtcNow - new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds : GameSeconds;
+            mode == WoolGrowthTimeMode.RealTime ? (GameClock.UtcNow - RealTimeEpoch).TotalSeconds : GameSeconds;
+
+        /// <summary>Converts a RealTime clock value back to UTC (diagnostics).</summary>
+        public static DateTime RealTimeToUtc(double clockSeconds) => RealTimeEpoch.AddSeconds(clockSeconds);
 
         static void EnsureLoaded()
         {
@@ -85,7 +94,18 @@ namespace ShearAndGrow.Economy
         /// <summary>Tests / dev reset: forget the in-memory value (next access reloads from disk).</summary>
         public static void ResetForTests() { _loaded = false; _gameSeconds = 0; _lastSavedAt = -1; }
 
-        /// <summary>Tests: set game time directly.</summary>
+        #if UNITY_EDITOR || UNITY_ENABLE_CHECKS
+                /// <summary>Developer time advance for GameTime mode (no 1 s hitch clamp). Dev builds only.</summary>
+                public static void DevAdvanceGameSeconds(double seconds)
+                {
+                    if (!(seconds > 0) || double.IsInfinity(seconds)) return;
+                    EnsureLoaded();
+                    _gameSeconds += seconds;
+                    Save();
+                }
+        #endif
+
+                /// <summary>Tests: set game time directly.</summary>
         public static void SetGameSecondsForTests(double s) { EnsureLoaded(); _gameSeconds = s; }
 
         public static int DeleteAll()

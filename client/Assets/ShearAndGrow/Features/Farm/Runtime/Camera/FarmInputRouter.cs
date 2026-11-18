@@ -47,6 +47,20 @@ namespace ShearAndGrow.Farm
 
         void OnApplicationFocus(bool f) { if (!f) Release(); }
         void OnApplicationPause(bool p) { if (p) Release(); }
+        void OnEnable() => ShearAndGrow.Economy.ScreenLayout.Changed += OnScreenChanged;
+        void OnDisable() => ShearAndGrow.Economy.ScreenLayout.Changed -= OnScreenChanged;
+
+        /// <summary>
+        /// Rotation mid-gesture: screen coordinates jump. The running pan / pinch / ghost drag ends through the normal
+        /// release path (a dragged ghost keeps its last valid cell – nothing is confirmed or bought) and the rest of
+        /// this touch is ignored until all fingers lift (no accidental tap).
+        /// </summary>
+        void OnScreenChanged()
+        {
+            if (_mode == Mode.None) return;
+            Release();
+            _mode = Mode.Blocked;
+        }
 
         float Slop => _tapSlop * Mathf.Max(0.5f, Screen.width / 1080f);
 

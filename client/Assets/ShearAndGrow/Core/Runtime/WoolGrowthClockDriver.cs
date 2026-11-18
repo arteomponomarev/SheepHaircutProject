@@ -22,16 +22,17 @@ namespace ShearAndGrow.Economy
 
         void OnEnable() => SceneManager.activeSceneChanged += OnSceneChanged;
         void OnDisable() => SceneManager.activeSceneChanged -= OnSceneChanged;
-        void OnSceneChanged(Scene a, Scene b) => WoolGrowthClock.Save();
+        void OnSceneChanged(Scene a, Scene b) { WoolGrowthClock.Save(); GameClock.Save(true); }
 
         void Update()
         {
             WoolGrowthClock.Advance(Time.unscaledDeltaTime);
             WoolGrowthClock.SaveIfDue(SaveInterval);
+            GameClock.Save(); // throttled internally (high-water mark for rollback protection)
         }
 
-        void OnApplicationPause(bool paused) { if (paused) WoolGrowthClock.Save(); }
-        void OnApplicationQuit() => WoolGrowthClock.Save();
-        void OnDestroy() { if (_instance == this) { WoolGrowthClock.Save(); _instance = null; } }
+        void OnApplicationPause(bool paused) { if (paused) { WoolGrowthClock.Save(); GameClock.Save(true); } }
+        void OnApplicationQuit() { WoolGrowthClock.Save(); GameClock.Save(true); }
+        void OnDestroy() { if (_instance == this) { WoolGrowthClock.Save(); GameClock.Save(true); _instance = null; } }
     }
 }

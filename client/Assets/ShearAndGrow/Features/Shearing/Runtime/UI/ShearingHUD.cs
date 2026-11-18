@@ -69,6 +69,7 @@ namespace ShearAndGrow.Shearing
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = _referenceResolution;
             scaler.matchWidthOrHeight = 0.5f;
+            canvasGo.AddComponent<OrientationCanvasScaler>().PortraitReference = _referenceResolution;
             canvasGo.AddComponent<GraphicRaycaster>();
 
             _safeRoot = NewRect("SafeArea", canvasGo.transform);
@@ -77,6 +78,7 @@ namespace ShearAndGrow.Shearing
 
             // --- top: progress
             var top = NewRect("ProgressPanel", _safeRoot);
+            _progressPanel = top;
             Anchor(top, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(760f, 120f), new Vector2(0.5f, 1f));
             AddImage(top.gameObject, _panelColor);
             _progressLabel = AddText("Label", top, "Wool sheared: 0%", 40, TextAnchor.UpperCenter);
@@ -103,6 +105,11 @@ namespace ShearAndGrow.Shearing
             Anchor(row, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -175f), new Vector2(900f, 70f), new Vector2(0.5f, 1f));
             var hl = row.gameObject.AddComponent<HorizontalLayoutGroup>();
             hl.spacing = 14f; hl.childForceExpandWidth = true; hl.childForceExpandHeight = true; hl.childControlWidth = true; hl.childControlHeight = true;
+            _toggleRow = row;
+            _toggleColumn = NewRect("TogglesColumn", _safeRoot);
+            var vl = _toggleColumn.gameObject.AddComponent<VerticalLayoutGroup>();
+            vl.spacing = 12f; vl.childForceExpandWidth = true; vl.childForceExpandHeight = true; vl.childControlWidth = true; vl.childControlHeight = true;
+            _toggleColumn.gameObject.SetActive(false);
             _hapticsLabel = AddButton(row, "Haptics", 28,() => { _haptics = !_haptics; RefreshToggleLabels(); HapticsToggled?.Invoke(_haptics); }).GetComponentInChildren<Text>();
             _soundLabel = AddButton(row, "Sound", 28,() => { _sound = !_sound; RefreshToggleLabels(); SoundToggled?.Invoke(_sound); }).GetComponentInChildren<Text>();
             if (_devTools)
@@ -148,6 +155,75 @@ namespace ShearAndGrow.Shearing
             Stretch(fade);
             _fade = AddImage(fade.gameObject, new Color(0.08f, 0.06f, 0.05f, 0f));
             _fade.raycastTarget = false;
+
+            ShearAndGrow.Economy.ScreenLayout.Changed += OnScreenChanged;
+            ApplyLayout(ShearAndGrow.Economy.ScreenLayout.IsLandscape);
+        }
+
+        // ------------------------------------------------------------------ portrait / landscape layouts
+
+        RectTransform _progressPanel, _toggleRow, _toggleColumn;
+        bool? _landscape;
+
+        public bool IsLandscapeLayout => _landscape == true;
+
+        void OnDestroy() => ShearAndGrow.Economy.ScreenLayout.Changed -= OnScreenChanged;
+
+        void OnScreenChanged()
+        {
+            ApplySafeArea();
+            ApplyLayout(ShearAndGrow.Economy.ScreenLayout.IsLandscape);
+        }
+
+        /// <summary>
+        /// Portrait: progress + toggles row on top, Back / Done at the bottom (unchanged original layout).
+        /// Landscape: progress top-centre, toggles as a column on the left edge so the sheep keeps the wide centre,
+        /// Back / Done in the bottom corners, completion card centred and scaled to the available height.
+        /// Only positions change – no state, events or session logic are touched.
+        /// </summary>
+        void ApplyLayout(bool landscape)
+        {
+            if (_safeRoot == null) return;
+            bool changed = _landscape != landscape;
+            _landscape = landscape;
+            if (changed)
+            {
+                var from = landscape ? _toggleRow : _toggleColumn;
+                var to = landscape ? _toggleColumn : _toggleRow;
+                while (from.childCount > 0) from.GetChild(0).SetParent(to, false);
+                _toggleRow.gameObject.SetActive(!landscape);
+                _toggleColumn.gameObject.SetActive(landscape);
+            }
+            int toggles = _toggleColumn.childCount + _toggleRow.childCount;
+            if (landscape)
+            {
+                Anchor(_progressPanel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -24f), new Vector2(760f, 120f), new Vector2(0.5f, 1f));
+                Anchor(_toggleColumn, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -24f), new Vector2(250f, toggles * 82f), new Vector2(0f, 1f));
+                Anchor(_hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(900f, 90f), new Vector2(0.5f, 0f));
+                Anchor((RectTransform)_backButton.transform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(28f, 28f), new Vector2(330f, 116f), new Vector2(0f, 0f));
+                Anchor((RectTransform)_finishButton.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 28f), new Vector2(300f, 116f), new Vector2(1f, 0f));
+                Anchor((RectTransform)_regrowButton.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 160f), new Vector2(300f, 80f), new Vector2(1f, 0f));
+                Anchor((RectTransform)_doneMenu.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 160f), new Vector2(640f, 330f), new Vector2(1f, 0f));
+                Anchor(_toast.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -170f), new Vector2(900f, 80f), new Vector2(0.5f, 1f));
+                Anchor((RectTransform)_completePanel.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(860f, 680f), new Vector2(0.5f, 0.5f));
+                if (_preservedChip != null) Anchor(_preservedChip.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -150f), new Vector2(760f, 50f), new Vector2(0.5f, 1f));
+            }
+            else
+            {
+                Anchor(_progressPanel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(760f, 120f), new Vector2(0.5f, 1f));
+                Anchor(_toggleRow, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -175f), new Vector2(900f, 70f), new Vector2(0.5f, 1f));
+                Anchor(_hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 330f), new Vector2(900f, 90f), new Vector2(0.5f, 0f));
+                Anchor((RectTransform)_backButton.transform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(36f, 36f), new Vector2(430f, 120f), new Vector2(0f, 0f));
+                Anchor((RectTransform)_finishButton.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-36f, 36f), new Vector2(330f, 120f), new Vector2(1f, 0f));
+                Anchor((RectTransform)_regrowButton.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-36f, 170f), new Vector2(330f, 80f), new Vector2(1f, 0f));
+                Anchor((RectTransform)_doneMenu.transform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-36f, 170f), new Vector2(640f, 330f), new Vector2(1f, 0f));
+                Anchor(_toast.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 300f), new Vector2(900f, 80f), new Vector2(0.5f, 0.5f));
+                Anchor((RectTransform)_completePanel.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -120f), new Vector2(860f, 680f), new Vector2(0.5f, 0.5f));
+                if (_preservedChip != null) Anchor(_preservedChip.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -258f), new Vector2(760f, 50f), new Vector2(0.5f, 1f));
+            }
+            Canvas.ForceUpdateCanvases();
+            UiFit.ScaleToFit((RectTransform)_completePanel.transform, _safeRoot);
+            UiFit.ScaleToFit((RectTransform)_doneMenu.transform, _safeRoot);
         }
 
         GameObject BuildCompletePanel()
@@ -217,6 +293,7 @@ namespace ShearAndGrow.Shearing
                 _preservedChip.color = _accentColor;
                 var sh = _preservedChip.gameObject.AddComponent<Shadow>();
                 sh.effectColor = new Color(0f, 0f, 0f, 0.5f);
+                ApplyLayout(_landscape ?? false);
             }
             _preservedChip.text = "Hairstyle saved · no regrowth";
             _preservedChip.gameObject.SetActive(preserved);

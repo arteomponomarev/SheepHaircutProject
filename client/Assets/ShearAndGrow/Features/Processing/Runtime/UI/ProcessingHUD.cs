@@ -76,6 +76,37 @@ namespace ShearAndGrow.Processing
             var fade = UiKit.Image(transform.GetChild(0), "Fade", new Color(0.08f, 0.06f, 0.05f, 1f), true);
             UiKit.Stretch(fade.rectTransform);
             _fade = fade;
+
+            ScreenLayoutChanged();
+            ShearAndGrow.Economy.ScreenLayout.Changed += ScreenLayoutChanged;
+        }
+
+        void OnDestroy() => ShearAndGrow.Economy.ScreenLayout.Changed -= ScreenLayoutChanged;
+
+        /// <summary>
+        /// Portrait: original layout (result card at the bottom). Landscape: the heap fills the centre, the result card
+        /// moves to the right edge and the hint sits lower; cards are scaled down only if the screen is too small.
+        /// </summary>
+        void ScreenLayoutChanged()
+        {
+            if (_safe == null) return;
+            bool landscape = ShearAndGrow.Economy.ScreenLayout.IsLandscape;
+            var hintRt = (RectTransform)_hint.transform;
+            var resultRt = (RectTransform)_result.transform;
+            if (landscape)
+            {
+                UiKit.Place(hintRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(900f, 200f));
+                UiKit.Place(resultRt, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-40f, -40f), new Vector2(900f, 470f));
+            }
+            else
+            {
+                UiKit.Place(hintRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 220f), new Vector2(900f, 200f));
+                UiKit.Place(resultRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 60f), new Vector2(900f, 470f));
+            }
+            Canvas.ForceUpdateCanvases();
+            ShearAndGrow.Shearing.UiFit.ScaleToFit(resultRt, _safe);
+            ShearAndGrow.Shearing.UiFit.ScaleToFit((RectTransform)_empty.transform, _safe);
+            ShearAndGrow.Shearing.UiFit.ScaleToFit((RectTransform)_confirm.transform.GetChild(0), _safe);
         }
 
         GameObject BuildConfirm()
@@ -160,15 +191,19 @@ namespace ShearAndGrow.Processing
 
         IEnumerator Pop(Transform t)
         {
+            t.localScale = Vector3.one;
+            Canvas.ForceUpdateCanvases();
+            ShearAndGrow.Shearing.UiFit.ScaleToFit((RectTransform)t, _safe);
+            float fit = t.localScale.x;
             float a = 0f;
             while (a < 1f)
             {
                 a = Mathf.Min(1f, a + Time.unscaledDeltaTime / 0.28f);
                 float s = 1f + Mathf.Sin(a * Mathf.PI) * 0.06f;
-                t.localScale = Vector3.one * Mathf.Lerp(0.85f, 1f, Mathf.SmoothStep(0f, 1f, a)) * s;
+                t.localScale = Vector3.one * (fit * Mathf.Lerp(0.85f, 1f, Mathf.SmoothStep(0f, 1f, a)) * s);
                 yield return null;
             }
-            t.localScale = Vector3.one;
+            t.localScale = Vector3.one * fit;
         }
 
         public IEnumerator Fade(float to, float seconds)

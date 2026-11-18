@@ -9,12 +9,13 @@ namespace ShearAndGrow.Farm
     }
 
     /// <summary>
-    /// Device UTC clock. MVP limitation: the device clock is trusted — moving it forward finishes constructions
-    /// early; moving it back never extends a construction beyond its configured duration (see BuildingService).
+    /// Game clock (<see cref="ShearAndGrow.Economy.GameClock"/>): device UTC today, monotonic (moving the device clock
+    /// back holds time instead of replaying it), plus the developer test timeline in dev builds. MVP limitation: the
+    /// device source is not trusted — moving it forward finishes constructions early until a server time source is set.
     /// </summary>
     public sealed class SystemBuildingClock : IBuildingClock
     {
-        public long UtcNowTicks => DateTime.UtcNow.Ticks;
+        public long UtcNowTicks => ShearAndGrow.Economy.GameClock.UtcNowTicks;
     }
 
     /// <summary>Manually driven clock (tests / QA).</summary>

@@ -105,17 +105,44 @@ namespace ShearAndGrow.Processing
             StartCoroutine(_hud.Fade(0f, 0.35f));
         }
 
+        float _baseFov = -1f, _fitDistance;
+
+        /// <summary>
+        /// Places the camera ONCE per session. The distance is always computed for the PORTRAIT aspect of this device
+        /// (identical to the original fit in portrait), so the camera position – and with it the reachable heap area
+        /// and the progress measurement – is the same whichever orientation the session starts or continues in.
+        /// Framing for the current aspect is done by <see cref="RefitFov"/> (field of view only).
+        /// </summary>
         void FitCamera()
         {
+            if (_baseFov < 0f) _baseFov = _camera.fieldOfView;
+            float aspect = Mathf.Max(0.3f, _camera.aspect);
+            float portraitAspect = aspect > 1f ? 1f / aspect : aspect;
             Vector3 c = _heap.transform.position + Vector3.up * (_config.HeapHeight * 0.35f);
-            float vFov = _camera.fieldOfView * Mathf.Deg2Rad;
-            float hFov = 2f * Mathf.Atan(Mathf.Tan(vFov * 0.5f) * Mathf.Max(0.3f, _camera.aspect));
-            float half = Mathf.Max(_config.HeapHalfSize.x, _config.HeapHalfSize.y * _camera.aspect) * _frameMargin;
+            float vFov = _baseFov * Mathf.Deg2Rad;
+            float hFov = 2f * Mathf.Atan(Mathf.Tan(vFov * 0.5f) * Mathf.Max(0.3f, portraitAspect));
+            float half = Mathf.Max(_config.HeapHalfSize.x, _config.HeapHalfSize.y * portraitAspect) * _frameMargin;
             float dist = half / Mathf.Tan(hFov * 0.5f);
+            _fitDistance = dist;
             Quaternion rot = Quaternion.Euler(_cameraPitch, 0f, 0f);
             // shift the view slightly down so the heap sits in the lower-middle (HUD lives at the top)
             _camera.transform.SetPositionAndRotation(c - rot * Vector3.forward * dist + Vector3.forward * (dist * 0.06f), rot);
+            RefitFov();
         }
+
+        /// <summary>Vertical FOV that frames the heap for the current aspect from the fixed camera position (equals the base FOV in portrait).</summary>
+        void RefitFov()
+        {
+            if (_camera == null || _fitDistance <= 0f) return;
+            float aspect = Mathf.Max(0.3f, _camera.aspect);
+            // landscape is height-limited: leave room for the heap's height and the slight downward framing shift
+            float vertical = _config.HeapHalfSize.y * (aspect > 1f ? 1.3f : 1f);
+            float tanV = Mathf.Max(_config.HeapHalfSize.x / aspect, vertical) * _frameMargin / _fitDistance;
+            _camera.fieldOfView = Mathf.Clamp(2f * Mathf.Atan(tanV) * Mathf.Rad2Deg, 10f, 100f);
+        }
+
+        void OnEnable() => ScreenLayout.Changed += RefitFov;
+        void OnDisable() => ScreenLayout.Changed -= RefitFov;
 
         Vector3[] HeapEdgePoints()
         {

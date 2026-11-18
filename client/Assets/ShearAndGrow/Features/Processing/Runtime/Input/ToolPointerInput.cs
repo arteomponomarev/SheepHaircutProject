@@ -33,7 +33,11 @@ namespace ShearAndGrow.Processing
 
         void OnApplicationFocus(bool focus) { if (!focus) Cancel(); }
         void OnApplicationPause(bool paused) { if (paused) Cancel(); }
-        void OnDisable() { if (_active) { _active = false; Released?.Invoke(); } }
+        void OnEnable() => ShearAndGrow.Economy.ScreenLayout.Changed += OnScreenChanged;
+        void OnDisable() { ShearAndGrow.Economy.ScreenLayout.Changed -= OnScreenChanged; if (_active) { _active = false; Released?.Invoke(); } }
+
+        /// <summary>Rotation mid-stroke: release the tool (normal release path) and wait until the finger lifts.</summary>
+        void OnScreenChanged() { if (_active) Cancel(); }
 
         void Update()
         {

@@ -235,6 +235,7 @@ namespace ShearAndGrow.Shearing
                 maskEncoding = 2,
                 growthClockStamp = GrowthNow,
             };
+            SheepWoolLifecycle.StampMode(s, _growth);
             SheepWoolStateStore.Stamp(s, _defaultState != null ? _defaultState.SaveEpoch : 0);
             return s;
         }

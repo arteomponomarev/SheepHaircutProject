@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: ShearAndGrow.Shearing::ShearAndGrow.Shearing.WoolGrowthConfig
   RegrowthEnabled: 1
   FullRegrowthDuration: 480
-  TimeMode: 0
+  TimeMode: 1
   RegrowthUpdateInterval: 2
   DebugRegrowthMultiplier: 1
   MaxOfflineCatchUp: 86400

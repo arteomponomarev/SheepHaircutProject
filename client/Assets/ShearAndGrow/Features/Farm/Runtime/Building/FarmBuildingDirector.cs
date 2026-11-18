@@ -189,6 +189,28 @@ namespace ShearAndGrow.Farm
         /// <summary>Development: finish running constructions immediately.</summary>
         public void DevFinish() { _svc?.DevFinishConstructions(); }
 
+        /// <summary>
+        /// Stops this director from ever writing farm.json again (tick, pause, quit). Used right before a developer
+        /// reset deletes the saves and reloads the scene, so the old farm can never be written back.
+        /// </summary>
+        public void SuspendForReset()
+        {
+            if (_svc != null) { _svc.StatusChanged -= OnStatusChanged; _svc.InstanceAdded -= OnInstanceAdded; }
+            _svc = null;
+            enabled = false;
+        }
+
+        /// <summary>Re-syncs construction visuals (site dressing, builder, building stage) after an out-of-band change.</summary>
+        public void RefreshConstructionVisuals()
+        {
+            if (_svc == null) return;
+            _svc.Tick();
+            _presenter.RefreshConstruction();
+            SyncSite(false);
+            var b = _svc.ActiveConstruction;
+            if (b != null && _site != null) _site.SetStage(_config.StageOf(_svc.Progress(b), out _));
+        }
+
         static AudioClip MakeKnock()
         {
             const int rate = 22050; int n = (int)(rate * 0.09f);

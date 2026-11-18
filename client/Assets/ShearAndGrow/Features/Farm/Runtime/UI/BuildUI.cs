@@ -85,16 +85,77 @@ namespace ShearAndGrow.Farm
             _dir.Service.Changed += OnDataChanged;
             if (WoolEconomy.IsReady) WoolEconomy.Instance.Changed += OnDataChanged;
             RefreshChip(true);
+            ApplyLayout();
+            ScreenLayout.Changed += ApplyLayout;
         }
 
         void OnDestroy()
         {
+            ScreenLayout.Changed -= ApplyLayout;
             if (_dir != null) { if (_dir.Placement != null) _dir.Placement.Changed -= RefreshBar; if (_dir.Service != null) _dir.Service.Changed -= OnDataChanged; }
             if (WoolEconomy.IsReady) WoolEconomy.Instance.Changed -= OnDataChanged;
         }
 
+        // ------------------------------------------------------------------ portrait / landscape
+
+        RectTransform _catalogRt, _catalogTitle, _catalogClose, _catalogViewport;
+
+        /// <summary>
+        /// Portrait: original layout (Edit bottom-left, Build bottom-right, tall catalog). Landscape: Build / Edit stacked
+        /// in a right-hand action column, compact catalog header (tabs beside the title) so cards fit the lower height,
+        /// placement bar / edit banner centred at a readable width, construction chip top-left under the HUD.
+        /// </summary>
+        void ApplyLayout()
+        {
+            if (_safe == null || _catalogRt == null) return;
+            bool landscape = ScreenLayout.IsLandscape;
+            var buildRt = (RectTransform)_buildBtn.transform;
+            var editRt = (RectTransform)_editBtn.transform;
+            var barRt = (RectTransform)_bar.transform;
+            var chipRt = (RectTransform)_chip.transform;
+            var bannerRt = (RectTransform)_banner.transform;
+            var tabB = (RectTransform)_tabBuildings.transform;
+            var tabD = (RectTransform)_tabDecor.transform;
+            if (landscape)
+            {
+                UiKit.Place(buildRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 40f), new Vector2(200f, 120f));
+                UiKit.Place(editRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 176f), new Vector2(200f, 120f));
+                float avail = _safe.rect.height > 1f ? _safe.rect.height - 150f : 760f;
+                float h = Mathf.Clamp(avail, 600f, 780f);
+                _catalogRt.anchorMin = new Vector2(0f, 0f); _catalogRt.anchorMax = new Vector2(1f, 0f); _catalogRt.pivot = new Vector2(0.5f, 0f);
+                _catalogRt.offsetMin = new Vector2(16f, 0f); _catalogRt.offsetMax = new Vector2(-16f, h);
+                UiKit.Place(_catalogTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -24f), new Vector2(260f, 96f));
+                UiKit.Place(tabB, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(320f, -24f), new Vector2(330f, 96f));
+                UiKit.Place(tabD, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(670f, -24f), new Vector2(330f, 96f));
+                UiKit.Place(_catalogClose, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -20f), new Vector2(110f, 110f));
+                _catalogViewport.offsetMin = new Vector2(24f, 20f); _catalogViewport.offsetMax = new Vector2(-24f, -140f);
+                UiKit.Place(barRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), new Vector2(1400f, 260f));
+                UiKit.Place(bannerRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 24f), new Vector2(1400f, 160f));
+                UiKit.Place(chipRt, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -150f), new Vector2(1000f, 86f));
+            }
+            else
+            {
+                UiKit.Place(buildRt, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-28f, 40f), new Vector2(200f, 120f));
+                UiKit.Place(editRt, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(28f, 40f), new Vector2(200f, 120f));
+                _catalogRt.anchorMin = new Vector2(0f, 0f); _catalogRt.anchorMax = new Vector2(1f, 0f); _catalogRt.pivot = new Vector2(0.5f, 0f);
+                _catalogRt.offsetMin = new Vector2(16f, 0f); _catalogRt.offsetMax = new Vector2(-16f, CatalogHeight);
+                UiKit.Place(_catalogTitle, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -30f), new Vector2(500f, 80f));
+                UiKit.Place(tabB, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -130f), new Vector2(330f, 96f));
+                UiKit.Place(tabD, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(390f, -130f), new Vector2(330f, 96f));
+                UiKit.Place(_catalogClose, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -24f), new Vector2(110f, 110f));
+                _catalogViewport.offsetMin = new Vector2(24f, 30f); _catalogViewport.offsetMax = new Vector2(-24f, -250f);
+                barRt.anchorMin = new Vector2(0f, 0f); barRt.anchorMax = new Vector2(1f, 0f); barRt.pivot = new Vector2(0.5f, 0f);
+                barRt.offsetMin = new Vector2(16f, 24f); barRt.offsetMax = new Vector2(-16f, 284f);
+                bannerRt.anchorMin = new Vector2(0f, 0f); bannerRt.anchorMax = new Vector2(1f, 0f); bannerRt.pivot = new Vector2(0.5f, 0f);
+                bannerRt.offsetMin = new Vector2(16f, 24f); bannerRt.offsetMax = new Vector2(-16f, 184f);
+                chipRt.anchorMin = new Vector2(0f, 1f); chipRt.anchorMax = new Vector2(1f, 1f); chipRt.pivot = new Vector2(0.5f, 1f);
+                chipRt.offsetMin = new Vector2(16f, -236f); chipRt.offsetMax = new Vector2(-16f, -150f);
+            }
+        }
+
         void OnDataChanged()
         {
+            if (_dir == null || _dir.Service == null) return; // farm is shutting down (scene change / dev reset)
             if (CatalogOpen) RefreshCards();
             if (_dir.Placement.IsActive) { _dir.Placement.Revalidate(); RefreshBar(); }
             RefreshChip(true);
@@ -142,10 +203,13 @@ namespace ShearAndGrow.Farm
             var rt = sheet.rectTransform;
             rt.anchorMin = new Vector2(0f, 0f); rt.anchorMax = new Vector2(1f, 0f); rt.pivot = new Vector2(0.5f, 0f);
             rt.offsetMin = new Vector2(16f, 0f); rt.offsetMax = new Vector2(-16f, CatalogHeight);
+            _catalogRt = rt;
             var title = UiKit.Text(rt, "Title", "Build", 56, TextAnchor.MiddleLeft);
             UiKit.Place(title.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -30f), new Vector2(500f, 80f));
+            _catalogTitle = title.rectTransform;
             var close = UiKit.Button(rt, "Close", "✕", 50, UiKit.PanelLight, () => CloseCatalog(), out _);
             UiKit.Place((RectTransform)close.transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-28f, -24f), new Vector2(100f, 100f));
+            _catalogClose = (RectTransform)close.transform;
             _tabBuildings = UiKit.Button(rt, "TabBuildings", "Buildings", 38, UiKit.Accent, () => SetTab(BuildingCategory.Building), out _);
             UiKit.Place((RectTransform)_tabBuildings.transform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -130f), new Vector2(330f, 96f));
             _tabDecor = UiKit.Button(rt, "TabDecorations", "Decorations", 38, UiKit.PanelLight, () => SetTab(BuildingCategory.Decoration), out _);
@@ -156,6 +220,7 @@ namespace ShearAndGrow.Farm
             var vrt = view.rectTransform;
             vrt.anchorMin = new Vector2(0f, 0f); vrt.anchorMax = new Vector2(1f, 1f);
             vrt.offsetMin = new Vector2(24f, 30f); vrt.offsetMax = new Vector2(-24f, -250f);
+            _catalogViewport = vrt;
             view.gameObject.AddComponent<RectMask2D>();
             _cards = UiKit.Rect("Cards", vrt);
             _cards.anchorMin = new Vector2(0f, 0f); _cards.anchorMax = new Vector2(0f, 1f); _cards.pivot = new Vector2(0f, 0.5f);

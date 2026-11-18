@@ -54,7 +54,14 @@ namespace ShearAndGrow.Shearing
 
         void OnApplicationFocus(bool focus) { if (!focus) CancelAll(); }
         void OnApplicationPause(bool paused) { if (paused) CancelAll(); }
-        void OnDisable() => CancelAll();
+        void OnEnable() => ShearAndGrow.Economy.ScreenLayout.Changed += OnScreenChanged;
+        void OnDisable() { ShearAndGrow.Economy.ScreenLayout.Changed -= OnScreenChanged; CancelAll(); }
+
+        /// <summary>
+        /// Rotation mid-gesture: screen coordinates jump, so the running stroke / orbit / pinch is ended (ShearEnd keeps
+        /// everything already cut – it is the normal release path) and ignored until all fingers lift.
+        /// </summary>
+        void OnScreenChanged() { if (_gesture != Gesture.None) CancelAll(); }
 
         void Update()
         {

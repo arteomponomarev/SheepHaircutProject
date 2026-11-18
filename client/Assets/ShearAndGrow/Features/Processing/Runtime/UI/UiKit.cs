@@ -35,6 +35,7 @@ namespace ShearAndGrow.Processing
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1080f, 1920f);
             scaler.matchWidthOrHeight = 0.5f;
+            go.AddComponent<ShearAndGrow.Shearing.OrientationCanvasScaler>(); // same physical size in portrait & landscape
             go.AddComponent<GraphicRaycaster>();
             safeRoot = Rect("SafeArea", go.transform);
             Stretch(safeRoot);

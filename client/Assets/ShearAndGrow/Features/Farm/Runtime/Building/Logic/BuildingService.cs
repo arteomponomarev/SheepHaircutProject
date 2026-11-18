@@ -569,7 +569,42 @@ result = CheckPurchase(def, cell);
             Tick();
         }
 
-        string NewInstanceId(string typeId)
+        #if UNITY_EDITOR || UNITY_ENABLE_CHECKS
+                // ------------------------------------------------------------------ developer interface (compiled out of release builds)
+
+                /// <summary>
+                /// Finishes running builder jobs of one kind (construction or upgrade) NOW through the normal completion path
+                /// (<see cref="Tick"/>): the instance completes once, the level is applied once, events refresh views, builder
+                /// and site, and the farm is saved. Nothing is charged again, no copy is made, no new timer starts.
+                /// Returns how many jobs completed.
+                /// </summary>
+                public int DevFinishJobs(BuildingStatus kind)
+                {
+                    long now = _clock.UtcNowTicks;
+                    int n = 0;
+                    foreach (var b in _state.instances)
+                        if (b.status == kind && b.IsBuilderBusy) { b.constructionEndUtcTicks = Math.Min(b.constructionEndUtcTicks, now); n++; }
+                    if (n == 0) return 0;
+                    Tick();
+                    return n;
+                }
+
+                /// <summary>Moves the running builder job(s) forward by <paramref name="seconds"/> (completes through Tick when due).</summary>
+                public int DevAdvanceJobs(double seconds)
+                {
+                    if (!(seconds > 0)) return 0;
+                    long d = (long)(Math.Min(seconds, 3650.0 * 86400.0) * TimeSpan.TicksPerSecond);
+                    int n = 0;
+                    foreach (var b in _state.instances)
+                        if (b.IsBuilderBusy) { b.constructionEndUtcTicks -= d; b.constructionStartUtcTicks -= d; n++; }
+                    if (n == 0) return 0;
+                    if (Tick() == 0) Save(); // nothing completed yet: persist the shifted timer
+                    Changed?.Invoke();
+                    return n;
+                }
+        #endif
+
+                string NewInstanceId(string typeId)
         {
             string id;
             do id = typeId + "_" + Guid.NewGuid().ToString("N").Substring(0, 10);

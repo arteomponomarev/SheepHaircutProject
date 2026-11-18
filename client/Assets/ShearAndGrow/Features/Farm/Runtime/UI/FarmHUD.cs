@@ -14,7 +14,8 @@ namespace ShearAndGrow.Farm
     public sealed class FarmHUD : MonoBehaviour
     {
         public event Action<bool> SoundToggled, HapticsToggled;
-        public event Action DevAddDirty, DevAddWet, DevReset, DevAddCoins, DevFinishBuild;
+        /// <summary>The player picked a screen orientation in Settings.</summary>
+        public event Action<ShearAndGrow.Economy.OrientationMode> OrientationPicked;
 
         RectTransform _safe, _coinIcon;
         Text _coins, _toast, _soundLabel, _hapticsLabel;
@@ -87,37 +88,66 @@ namespace ShearAndGrow.Farm
             UiKit.Stretch(_fade.rectTransform);
         }
 
+        readonly Button[] _orientationButtons = new Button[3];
+        GameObject _devButton;
+        RectTransform _settingsRt;
+
         void BuildSettings(bool devTools)
         {
             var pop = UiKit.Image(_safe, "SettingsPopover", UiKit.Panel, true);
-            float popH = devTools ? 700f : 250f;
-            UiKit.Place(pop.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -150f), new Vector2(420f, popH));
+            _settingsRt = pop.rectTransform;
+            UiKit.Place(pop.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -150f), new Vector2(460f, 100f));
             var col = pop.gameObject.AddComponent<VerticalLayoutGroup>();
             col.padding = new RectOffset(18, 18, 18, 18); col.spacing = 12f;
             col.childControlWidth = col.childControlHeight = true; col.childForceExpandWidth = true; col.childForceExpandHeight = false;
+            var fit = pop.gameObject.AddComponent<ContentSizeFitter>();
+            fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             UiKit.Button(pop.transform, "Sound", "", 34, UiKit.PanelLight, () => { _sound = !_sound; Refresh(); SoundToggled?.Invoke(_sound); }, out _soundLabel).gameObject.AddComponent<LayoutElement>().preferredHeight = 96f;
             UiKit.Button(pop.transform, "Haptics", "", 34, UiKit.PanelLight, () => { _haptics = !_haptics; Refresh(); HapticsToggled?.Invoke(_haptics); }, out _hapticsLabel).gameObject.AddComponent<LayoutElement>().preferredHeight = 96f;
+
+            // screen orientation (player setting, persisted by OrientationService)
+            var head = UiKit.Text(pop.transform, "ScreenLabel", "Screen", 28, TextAnchor.LowerLeft, UiKit.TextMuted);
+            head.gameObject.AddComponent<LayoutElement>().preferredHeight = 40f;
+            var row = UiKit.Rect("OrientationRow", pop.transform);
+            row.gameObject.AddComponent<LayoutElement>().preferredHeight = 92f;
+            var hl = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hl.spacing = 8f; hl.childControlWidth = hl.childControlHeight = true; hl.childForceExpandWidth = hl.childForceExpandHeight = true;
+            for (int i = 0; i < 3; i++)
+            {
+                var mode = (ShearAndGrow.Economy.OrientationMode)i;
+                _orientationButtons[i] = UiKit.Button(row, "Orientation" + mode, ShearAndGrow.Economy.OrientationService.Label(mode), 27, UiKit.PanelLight,
+                    () => { OrientationPicked?.Invoke(mode); Refresh(); }, out _);
+            }
+
+            // Developer Panel entry: exists only when the DevTools assembly is compiled in (Editor / Development build)
             if (devTools)
             {
                 var dev = new Color(0.36f, 0.16f, 0.12f, 0.95f);
-                UiKit.Button(pop.transform, "DevDirty", "DEV +100 Dirty", 28, dev, () => DevAddDirty?.Invoke(), out _).gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
-                UiKit.Button(pop.transform, "DevWet", "DEV +100 Wet", 28, dev, () => DevAddWet?.Invoke(), out _).gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
-                UiKit.Button(pop.transform, "DevCoins", "DEV +100 Coins", 28, dev, () => DevAddCoins?.Invoke(), out _).gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
-                UiKit.Button(pop.transform, "DevFinish", "DEV Finish Building", 28, dev, () => DevFinishBuild?.Invoke(), out _).gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
-                UiKit.Button(pop.transform, "DevReset", "DEV Reset Save", 28, dev, () => DevReset?.Invoke(), out _).gameObject.AddComponent<LayoutElement>().preferredHeight = 76f;
+                var b = UiKit.Button(pop.transform, "DeveloperPanel", "DEV · Developer Panel", 28, dev, () => { CloseSettings(); ShearAndGrow.Economy.DevToolsGate.Open(); }, out _);
+                b.gameObject.AddComponent<LayoutElement>().preferredHeight = 84f;
+                _devButton = b.gameObject;
+                ShearAndGrow.Economy.DevToolsGate.AvailabilityChanged += RefreshDevButton;
             }
             _settings = pop.gameObject;
             _settings.SetActive(false);
             Refresh();
         }
 
+        void OnDestroy() => ShearAndGrow.Economy.DevToolsGate.AvailabilityChanged -= RefreshDevButton;
+
+        void RefreshDevButton() { if (_devButton != null) _devButton.SetActive(ShearAndGrow.Economy.DevToolsGate.IsAvailable); }
+
         void Refresh()
         {
             _soundLabel.text = (_sound ? "● " : "○ ") + "Sound";
             _hapticsLabel.text = (_haptics ? "● " : "○ ") + "Haptics";
+            var current = ShearAndGrow.Economy.OrientationService.Mode;
+            for (int i = 0; i < 3; i++)
+                if (_orientationButtons[i] != null) _orientationButtons[i].image.color = (int)current == i ? UiKit.Accent : UiKit.PanelLight;
+            RefreshDevButton();
         }
 
-        public void ToggleSettings() => _settings.SetActive(!_settings.activeSelf);
+        public void ToggleSettings() { if (!_settings.activeSelf) Refresh(); _settings.SetActive(!_settings.activeSelf); }
         public void CloseSettings() { if (_settings != null) _settings.SetActive(false); }
 
         public void SetCoins(long coins)

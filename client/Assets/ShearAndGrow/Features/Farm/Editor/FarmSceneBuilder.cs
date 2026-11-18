@@ -482,6 +482,8 @@ namespace ShearAndGrow.Farm.Editor
             camData.renderPostProcessing = true;
             camData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
             var camCtl = camGo.AddComponent<FarmCameraController>();
+            var presetLib = AssetDatabase.LoadAssetAtPath<FarmCameraPresetLibrary>("Assets/ShearAndGrow/Features/Farm/Config/FarmCameraPresets.asset");
+            if (presetLib != null) { var so = new SerializedObject(camCtl); so.FindProperty("_presets").objectReferenceValue = presetLib; so.ApplyModifiedPropertiesWithoutUndo(); }
 
             var sun = new GameObject("Sun (soft shadows)").AddComponent<Light>();
             sun.type = LightType.Directional; sun.color = new Color(1f, 0.93f, 0.8f); sun.intensity = 1.25f;

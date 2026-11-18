@@ -48,6 +48,12 @@ namespace ShearAndGrow.Shearing
         public double growthClockStamp;
         /// <summary>Unapplied growth time carried between catch-ups (keeps chunked growth exact).</summary>
         public double growthCarrySeconds;
+        /// <summary>
+        /// Timebase of <see cref="growthClockStamp"/> / <see cref="feedBoostUntil"/> (WoolGrowthTimeMode: 0 = GameTime,
+        /// 1 = RealTime). Missing in older files = 0 (GameTime, the only mode they were written with). When the config
+        /// mode differs, the stamps are shifted into the new timebase so pending growth is neither lost nor duplicated.
+        /// </summary>
+        public int growthClockMode;
         /// <summary>Hairstyle preserved: growth paused, shape kept (cosmetics / contests later).</summary>
         public bool hairstylePreserved;
         public string preservedUtc;

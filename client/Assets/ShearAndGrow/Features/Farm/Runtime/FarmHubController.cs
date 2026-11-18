@@ -107,11 +107,8 @@ namespace ShearAndGrow.Farm
 
             _hud.SoundToggled += on => { PlayerPrefs.SetInt(ShearingAudioDirector.PrefKey, on ? 1 : 0); PlayerPrefs.Save(); ApplySound(); Play(_tap); };
             _hud.HapticsToggled += on => { _haptics.Manager?.SetEnabled(on); Play(_tap); };
-            _hud.DevAddDirty += () => _econ.DevAdd(WoolType.Dirty, 100);
-            _hud.DevAddWet += () => _econ.DevAdd(WoolType.Wet, 100);
-            _hud.DevReset += DevReset;
-            _hud.DevAddCoins += () => _econ.DevAddCoins(100);
-            _hud.DevFinishBuild += () => _director.DevFinish();
+            _hud.OrientationPicked += OnOrientationPicked;
+            ScreenLayout.Changed += OnScreenLayoutChanged;
             _sell.Sold += OnSold;
             _sell.CoinArrived += OnCoinArrived;
             _sell.Closed += () => _selection.Deselect();
@@ -127,7 +124,13 @@ namespace ShearAndGrow.Farm
             string reopen = LaunchContext.ConsumeReturnPanel();
             StartCoroutine(_hud.FadeTo(0f, 0.35f));
             if (!string.IsNullOrEmpty(reopen)) { var t = Find(reopen); if (t != null) Select(t); }
+            Active = this;
+            ActiveChanged?.Invoke(this);
         }
+
+        /// <summary>The running Farm Hub (null outside the farm scene). Lets dev tools reach the farm's services without scene searches.</summary>
+        public static FarmHubController Active { get; private set; }
+        public static event System.Action<FarmHubController> ActiveChanged;
 
         [SerializeField] private GraphicsQualityConfig _quality;
 
@@ -259,7 +262,7 @@ namespace ShearAndGrow.Farm
             else
             {
                 _selection.Select(target);
-                _camera.FocusOn(target.ViewBounds, _panels.FocusViewportY, false);
+                _camera.FocusOn(target.ViewBounds, _panels.FocusViewport, false);
                 Play(_open, 0.35f);
             }
             // a building still under construction only shows its progress (no functional actions yet)
@@ -359,20 +362,103 @@ namespace ShearAndGrow.Farm
             UpdateBuildButtons();
         }
 
-        // ------------------------------------------------------------------ dev
+        // ------------------------------------------------------------------ orientation
 
-        void DevReset()
+        void OnOrientationPicked(OrientationMode mode)
         {
-            if (!Debug.isDebugBuild) return;
-            SheepWoolStateStore.DeleteAll();
-            FarmStateStore.DeleteAll();
-            _econ.DevReset();
-            _devResetting = true; // don't let OnDestroy / pause write the old farm back
-            // reload the farm: views, grid, builder and sheep are rebuilt from the fresh new-player data
-            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            Play(_tap, 0.6f);
+            OrientationService.SetMode(mode);
+            _hud.ShowToast("Screen: " + OrientationService.Label(mode));
         }
 
-        void OnDestroy() { if (_econ != null) _econ.Changed -= OnEconomyChanged; }
+        /// <summary>
+        /// Rotation keeps everything: the scene, the open panel, the selection, placement and coins stay as they are
+        /// (input routers end only the gesture that was running). Panels re-layout themselves; the selected building is
+        /// re-framed for the new panel position.
+        /// </summary>
+        void OnScreenLayoutChanged()
+        {
+            if (_leaving || _camera == null) return;
+            var sel = _selection != null ? _selection.Selected : null;
+            if (sel != null && _panels.IsOpen) _camera.FocusOn(sel.ViewBounds, _panels.FocusViewport, false);
+            _labels.MarkDirty();
+        }
+
+        // ------------------------------------------------------------------ refresh hooks (data changed outside the normal UI flow)
+
+        /// <summary>Re-reads sheep infos and pushes coats / labels (after a wool state change through a service).</summary>
+        public void RefreshSheepVisuals()
+        {
+            if (_states == null) return;
+            RefreshSheepInfos();
+            PushCoats(true);
+            _labels.RefreshTexts();
+        }
+
+        /// <summary>Refreshes building-dependent UI (labels, open catalog, open sheet).</summary>
+        public void RefreshBuildingUi()
+        {
+            _labels.RefreshTexts();
+            if (_buildUI.CatalogOpen) _buildUI.RefreshCards();
+            var sel = _selection != null ? _selection.Selected : null;
+            if (sel != null && _panels.IsOpen) RefreshAfterChange(sel);
+        }
+
+        // ------------------------------------------------------------------ dev (compiled out of release builds)
+
+#if UNITY_EDITOR || UNITY_ENABLE_CHECKS
+        /// <summary>
+        /// Developer "Reset Farm To Fresh Save" (LOCAL test saves only – there is no backend). Stops every writer of the
+        /// old farm first, deletes the local farm / sheep / economy saves and reloads the scene, so the farm is rebuilt by
+        /// the SAME new-player initialisation as a first launch (FarmState.NewPlayer + starting herd + default economy).
+        /// </summary>
+        public bool DevResetFarmToFreshSave()
+        {
+            if (_leaving) return false;
+            _leaving = true;
+            _devResetting = true;
+            if (_director.Placement.IsActive) _director.Placement.Cancel();
+            _input.SetEnabled(false);
+            _haptics.StopAll();
+            _econ.Changed -= OnEconomyChanged; // the old farm UI must not react to the economy reset
+            _director.SuspendForReset();     // no more farm.json writes from the old state (tick / pause / quit)
+            enabled = false;                 // no more growth ticks / UI updates on the old data
+            try
+            {
+                SheepWoolStateStore.DeleteAll();
+                FarmStateStore.DeleteAll();
+                _econ.DevReset();
+                LaunchContext.SheepId = null; LaunchContext.ReturnPanel = null; LaunchContext.HasFarmView = false;
+            }
+            finally
+            {
+                // always rebuild from disk once the saves were touched – never keep running on half-reset state
+                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            }
+            return true;
+        }
+
+        /// <summary>Reloads the farm scene from the saved files (Developer Panel "Reload Current Save").</summary>
+        public bool DevReloadFromSave()
+        {
+            if (_leaving) return false;
+            if (_director.Placement.IsActive) _director.Placement.Cancel();
+            _director.SaveNow();
+            _leaving = true;
+            LaunchContext.StoreFarmView(_camera.SettledFocus, _camera.TargetSize);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            return true;
+        }
+
+        public bool DevResetting => _devResetting;
+#endif
+
+        void OnDestroy()
+        {
+            if (_econ != null) _econ.Changed -= OnEconomyChanged;
+            ScreenLayout.Changed -= OnScreenLayoutChanged;
+            if (Active == this) { Active = null; ActiveChanged?.Invoke(null); }
+        }
 
         // ------------------------------------------------------------------ QA
         public void QA_Tap(Vector2 screen) => OnTap(screen);

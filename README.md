@@ -2,7 +2,7 @@
 
 Monorepository for the Unity client and PlayFab / Azure Functions backend.
 
-- `client/`: Unity project. Open this directory in Unity Hub (6000.6.8f1).
+- `client/`: Unity project. Open this directory in Unity Hub (6000.6.10f1).
 - `backend/`: server implementation (not implemented yet).
 - `Documentation/`: game documentation and references.
 - `SheepHaircutProject.slnx`: manually maintained solution for integration work.

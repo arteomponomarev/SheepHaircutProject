@@ -133,7 +133,9 @@ namespace ShearAndGrow.Shearing
         /// <summary>Orbit by a screen-space drag delta (pixels). Drag up lowers the camera; past the lowest pitch it rolls the sheep.</summary>
         public void AddOrbit(Vector2 screenDelta)
         {
-            float w = Mathf.Max(1, Screen.width), h = Mathf.Max(1, Screen.height);
+            // Normalised to the SHORT side for yaw and the LONG side for pitch: identical to the original portrait feel
+            // (width = short, height = long) and the same physical swipe gives the same rotation in landscape.
+            float w = Mathf.Max(1, Mathf.Min(Screen.width, Screen.height)), h = Mathf.Max(1, Mathf.Max(Screen.width, Screen.height));
             _targetYaw += screenDelta.x / w * _yawPerScreenWidth;
             float pitchDelta = -screenDelta.y / h * _pitchPerScreenHeight;
             if (_pose == null) { _targetPitch = Mathf.Clamp(_targetPitch + pitchDelta, _pitchLimits.x, _pitchLimits.y); return; }

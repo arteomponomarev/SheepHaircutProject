@@ -8,6 +8,7 @@
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
+!/client/Assets/ShearAndGrow/Features/Shearing/Editor/Build/
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/

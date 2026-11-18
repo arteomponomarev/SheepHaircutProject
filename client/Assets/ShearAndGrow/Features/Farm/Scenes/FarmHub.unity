@@ -593,10 +593,13 @@ MonoBehaviour:
   _pitch: 48
   _yaw: 0
   _distance: 40
+  _presets: {fileID: 11400000, guid: 53435edce47144be28727ee195936a38, type: 2}
   _coreBounds:
     m_Center: {x: 0, y: 1.5, z: 0}
     m_Extent: {x: 7.5, y: 1.5, z: 11}
   _topUiFraction: 0.15
+  _landscapeTopUiFraction: 0.16
+  _landscapeRightUiFraction: 0.12
   _minSize: 3.2
   _maxSize: 20
   _wheelStep: 0.12

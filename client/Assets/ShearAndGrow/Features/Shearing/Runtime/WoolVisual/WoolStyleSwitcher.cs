@@ -55,6 +55,25 @@ namespace ShearAndGrow.Shearing
             PlayerPrefs.Save();
         }
 
+        private RectTransform _selectorSafe, _selectorRt;
+
+        /// <summary>Safe area + position: under the toggles row in portrait, top-right corner in landscape.</summary>
+        private void ApplySelectorLayout()
+        {
+            if (_selectorSafe == null || _selectorRt == null) return;
+            var area = Screen.safeArea;
+            float w = Mathf.Max(1, Screen.width), h = Mathf.Max(1, Screen.height);
+            _selectorSafe.anchorMin = new Vector2(area.xMin / w, area.yMin / h);
+            _selectorSafe.anchorMax = new Vector2(area.xMax / w, area.yMax / h);
+            _selectorSafe.offsetMin = _selectorSafe.offsetMax = Vector2.zero;
+            bool landscape = ShearAndGrow.Economy.ScreenLayout.IsLandscape;
+            _selectorRt.anchorMin = _selectorRt.anchorMax = landscape ? new Vector2(1f, 1f) : new Vector2(0.5f, 1f);
+            _selectorRt.pivot = landscape ? new Vector2(1f, 1f) : new Vector2(0.5f, 1f);
+            _selectorRt.anchoredPosition = landscape ? new Vector2(-28f, -24f) : new Vector2(0f, -255f);
+        }
+
+
+
         private void HideSelector() { if (_selectorCanvas != null) _selectorCanvas.SetActive(false); }
         private void ShowSelector() { if (_selectorCanvas != null) _selectorCanvas.SetActive(true); }
 
@@ -108,13 +127,14 @@ namespace ShearAndGrow.Shearing
             var scaler = go.AddComponent<UnityEngine.UI.CanvasScaler>();
             scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1080f, 1920f); scaler.matchWidthOrHeight = 0.5f;
+            go.AddComponent<OrientationCanvasScaler>();
             go.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             var safe = Rect("SafeArea", go.transform, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero);
-            var area = Screen.safeArea;
-            safe.anchorMin = new Vector2(area.xMin / Screen.width, area.yMin / Screen.height);
-            safe.anchorMax = new Vector2(area.xMax / Screen.width, area.yMax / Screen.height);
-            safe.offsetMin = safe.offsetMax = Vector2.zero;
+            _selectorSafe = safe;
             var rt = Rect("Wool Style", safe, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -255f), new Vector2(540f, 76f));
+            _selectorRt = rt;
+            ApplySelectorLayout();
+            ShearAndGrow.Economy.ScreenLayout.Changed += ApplySelectorLayout;
             var image = rt.gameObject.AddComponent<UnityEngine.UI.Image>(); image.color = new Color(0.19f, 0.14f, 0.10f, 0.95f);
             _dropdown = rt.gameObject.AddComponent<UnityEngine.UI.Dropdown>(); _dropdown.targetGraphic = image;
             var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -147,6 +167,7 @@ namespace ShearAndGrow.Shearing
 
         private void OnDestroy()
         {
+            ShearAndGrow.Economy.ScreenLayout.Changed -= ApplySelectorLayout;
             if (_session != null && _session.Hub != null)
             {
                 _session.Hub.Clump -= OnClump;
